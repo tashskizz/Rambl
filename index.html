@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rambl - Voice Journaling App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            min-height: 100vh;
+            color: #2d1b69;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: white;
+            box-shadow: 0 0 50px rgba(106, 90, 205, 0.1);
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.4s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Common Styles */
+        .header {
+            padding: 60px 30px 30px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-content {
+            padding: 30px 20px 100px;
+            background: white;
+            min-height: calc(100vh - 200px);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            padding: 15px 30px 30px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8b5cf6;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #6b46c1;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Auth Screens */
+        .auth-screen {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            min-height: 100vh;
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 80px; height: 80px; top: 20%; left: -20px; animation-delay: 0s;
+        }
+        .floating-shape:nth-child(2) {
+            width: 120px; height: 120px; top: 60%; right: -40px; animation-delay: 2s;
+        }
+        .floating-shape:nth-child(3) {
+            width: 60px; height: 60px; bottom: 30%; left: 10%; animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.3; }
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+        }
+
+        .logo svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 8px 32px rgba(0,0,0,0.2));
+        }
+
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            line-height: 1.4;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 30px 30px 0 0;
+            padding: 40px 30px 30px;
+            margin-top: 20px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 2px;
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d1b69;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            font-size: 16px;
+            color: #6b46c1;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(139, 92, 246, 0.15);
+            border-radius: 16px;
+            font-size: 16px;
+            background: rgba(248, 246, 255, 0.5);
+            color: #2d1b69;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #8b5cf6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+
+        .primary-button {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 30px 0 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .primary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #6b46c1;
+        }
+
+        .auth-switch button {
+            background: none;
+            border: none;
+            color: #8b5cf6;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+        }
+
+        /* Home Screen Styles */
+        .home-header {
+            text-align: center;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #6b46c1;
+        }
+
+        .prompt-categories {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            border-color: #a855f7;
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2);
+        }
+
+        .category-card.selected {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+        }
+
+        .category-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .category-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .category-levels {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .voice-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border: none;
+            color: white;
+            font-size: 48px;
+            cursor: pointer;
+            margin: 30px auto;
+            display: block;
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .voice-button:hover {
+            transform: scale(1.05);
+        }
+
+        .voice-button.recording {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Analytics Styles */
+        .time-selector {
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 4px;
+            margin-top: 20px;
+        }
+
+        .time-option {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .time-option.active {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f8f6ff 0%, #f3f0ff 100%);
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6b46c1;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+
+        /* Library Styles */
+        .search-bar {
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .featured-meditation {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .featured-description {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .featured-play {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .meditation-item {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .meditation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .meditation-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .meditation-play {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .meditation-play:hover {
+            transform: scale(1.1);
+        }
+
+        .meditation-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d1b69;
+        }
+
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #8b5cf6, #a855f7);
+            opacity: 0.3;
+        }
+
+        .timeline-group {
+            margin-bottom: 35px;
+        }
+
+        .date-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #6b46c1;
+            margin-bottom: 20px;
+            padding-left: 60px;
+            position: relative;
+        }
+
+        .date-header::before {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #8b5cf6;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        .journal-entry {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            margin-left: 60px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .journal-entry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .journal-entry::before {
+            content: '';
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #a855f7;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .entry-header {
+            padding: 20px 20px 15px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .entry-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .entry-time {
+            font-size: 14px;
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+
+        .entry-category {
+            background: rgba(139, 92, 246, 0.1);
+            color: #6b46c1;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .entry-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d1b69;
+            margin-bottom: 8px;
+        }
+
+        .audio-player {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 375px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .bottom-nav {
+                width: 100%;
+            }
+        }
+
+        /* Loading and transition states */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.3);
+            z-index: 1000;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Login Screen -->
+        <div class="screen auth-screen active" id="loginScreen">
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            
+            <div style="padding: 80px 30px 40px; text-align: center;">
+                <div class="logo">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 80 L20 20 C20 20, 30 10, 55 20 C70 25, 75 35, 70 50 C65 60, 55 65, 40 60" 
+                                  stroke-dasharray="3,1" opacity="0.9"/>
+                            <path d="M23 18 L23 82 M40 60 L75 85" stroke-width="3.5"/>
+                            <path d="M23 20 C23 20, 33 8, 58 18 C73 23, 80 33, 75 48 C70 58, 60 63, 45 58"
+                                  stroke-dasharray="2,3" opacity="0.7"/>
+                            <circle cx="35" cy="35" r="4" fill="#ffffff" opacity="0.8"/>
+                            <path d="M50 35 Q58 42, 50 50" stroke-width="3" opacity="0.9"/>
+                        </g>
+                    </svg>
+                </div>
+                <h1 class="welcome-title">Welcome to Rambl</h1>
+                <p class="welcome-subtitle">Your voice journaling journey starts here</p>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-title">Sign In</h2>
+                <p class="form-subtitle">Enter your details to continue</p>
+
+                <form id="loginForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <input type="email" class="form-input" placeholder="Email address" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-input" placeholder="Password" required>
+                    </div>
+                    <button type="button" class="primary-button" onclick="doLogin()">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="auth-switch">
+                    Don't have an account? 
+                    <button onclick="showScreen('signupScreen')">Sign Up</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Screen -->
+        <div class="screen auth-screen" id="signupScreen">
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            
+            <div style="padding: 80px 30px 40px; text-align: center;">
+                <div class="logo">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 80 L20 20 C20 20, 30 10, 55 20 C70 25, 75 35, 70 50 C65 60, 55 65, 40 60" 
+                                  stroke-dasharray="3,1" opacity="0.9"/>
+                            <path d="M23 18 L23 82 M40 60 L75 85" stroke-width="3.5"/>
+                            <circle cx="35" cy="35" r="4" fill="#ffffff" opacity="0.8"/>
+                        </g>
+                    </svg>
+                </div>
+                <h1 class="welcome-title">Start Your Journey</h1>
+                <p class="welcome-subtitle">Create your account and begin voice journaling</p>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-title">Create Account</h2>
+                <p class="form-subtitle">Join thousands discovering insights through voice</p>
+
+                <form id="signupForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <input type="text" class="form-input" placeholder="Full name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-input" placeholder="Email address" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-input" placeholder="Password" required>
+                    </div>
+                    <button type="button" class="primary-button" onclick="doSignup()">
+                        Create Account
+                    </button>
+                </form>
+
+                <div class="auth-switch">
+                    Already have an account? 
+                    <button onclick="showScreen('loginScreen')">Sign In</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <div class="screen" id="homeScreen">
+            <div class="header">
+                <div class="header-content home-header">
+                    <div class="logo" style="width: 80px; height: 80px;">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 65 L15 15 C15 15, 25 8, 45 15 C55 18, 58 25, 55 35 C52 42, 45 45, 35 42" 
+                                      stroke-dasharray="2,1" opacity="0.8"/>
+                                <path d="M18 12 L18 68 M35 42 L60 68" stroke-width="2.5"/>
+                                <circle cx="25" cy="25" r="3" fill="#ffffff" opacity="0.7"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <h1 class="app-title">Rambl</h1>
+                    <p class="app-subtitle">Your voice, your thoughts, your journey</p>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="section">
+                    <h2 class="section-title">Choose Your Prompt</h2>
+                    <div class="prompt-categories">
+                        <div class="category-card" data-category="reflection">
+                            <div class="category-icon">💭</div>
+                            <div class="category-title">Reflection</div>
+                            <div class="category-levels">7 Levels</div>
+                        </div>
+                        <div class="category-card" data-category="growth">
+                            <div class="category-icon">🌱</div>
+                            <div class="category-title">Growth</div>
+                            <div class="category-levels">8 Levels</div>
+                        </div>
+                        <div class="category-card" data-category="future">
+                            <div class="category-icon">🔮</div>
+                            <div class="category-title">Future</div>
+                            <div class="category-levels">5 Levels</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="voice-button" id="voiceButton">🎤</button>
+
+                <div style="background: linear-gradient(135deg, #f8f6ff 0%, #f3f0ff 100%); border-radius: 20px; padding: 25px; margin-top: 30px; border: 1px solid rgba(139, 92, 246, 0.1);">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #6b46c1;">Your Recent Insights</h3>
+                    <div style="padding: 12px 0; border-bottom: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 20px;">📈</span>
+                        <span style="flex: 1; font-size: 14px; color: #4c1d95;">Positivity trending upward</span>
+                        <span style="font-size: 12px; color: #8b5cf6; font-weight: 500;">+12%</span>
+                    </div>
+                    <div style="padding: 12px 0; border-bottom: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 20px;">🎯</span>
+                        <span style="flex: 1; font-size: 14px; color: #4c1d95;">Goal clarity improving</span>
+                        <span style="font-size: 12px; color: #8b5cf6; font-weight: 500;">+8%</span>
+                    </div>
+                    <div style="padding: 12px 0; display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 20px;">💡</span>
+                        <span style="flex: 1; font-size: 14px; color: #4c1d95;">New reading suggestion ready</span>
+                        <span style="font-size: 12px; color: #8b5cf6; font-weight: 500;">New</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showScreen('homeScreen')">
+                    <div class="nav-icon">🏠</div>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="showScreen('analyticsScreen')">
+                    <div class="nav-icon">📊</div>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item" onclick="showScreen('libraryScreen')">
+                    <div class="nav-icon">📚</div>
+                    <span>Library</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">⚙️</div>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Screen -->
+        <div class="screen" id="analyticsScreen">
+            <div class="header">
+                <div class="header-content">
+                    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">Your Journey</h1>
+                    <p style="font-size: 16px; opacity: 0.9; font-weight: 400;">Insights from your voice</p>
+                    <div class="time-selector">
+                        <div class="time-option">7D</div>
+                        <div class="time-option active">30D</div>
+                        <div class="time-option">90D</div>
+                        <div class="time-option">All</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="metric-grid">
+                    <div class="metric-card" onclick="showScreen('timelineScreen')">
+                        <div class="metric-value">23</div>
+                        <div class="metric-label">Sessions</div>
+                        <div style="font-size: 11px; margin-top: 5px; padding: 2px 8px; border-radius: 8px; font-weight: 600; color: #059669; background: rgba(5, 150, 105, 0.1);">+18%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">4.2</div>
+                        <div class="metric-label">Avg Mood</div>
+                        <div style="font-size: 11px; margin-top: 5px; padding: 2px 8px; border-radius: 8px; font-weight: 600; color: #059669; background: rgba(5, 150, 105, 0.1);">+0.8</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Min Spoken</div>
+                        <div style="font-size: 11px; margin-top: 5px; padding: 2px 8px; border-radius: 8px; font-weight: 600; color: #059669; background: rgba(5, 150, 105, 0.1);">+12%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">78%</div>
+                        <div class="metric-label">Positivity</div>
+                        <div style="font-size: 11px; margin-top: 5px; padding: 2px 8px; border-radius: 8px; font-weight: 600; color: #059669; background: rgba(5, 150, 105, 0.1);">+15%</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 10px; font-size: 22px;">📈</span>
+                        Emotional Journey
+                    </h2>
+                    <div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1);">
+                        <div style="height: 120px; background: linear-gradient(to right, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.15) 25%, rgba(139, 92, 246, 0.2) 50%, rgba(168, 85, 247, 0.15) 75%, rgba(139, 92, 246, 0.1) 100%); border-radius: 8px; position: relative;">
+                            <div style="position: absolute; top: 30%; left: 0; right: 0; height: 3px; background: linear-gradient(to right, #8b5cf6, #a855f7, #8b5cf6, #a855f7); border-radius: 2px;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: #8b5cf6;">
+                            <span>Week 1</span>
+                            <span>Week 2</span>
+                            <span>Week 3</span>
+                            <span>Week 4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 10px; font-size: 22px;">🧠</span>
+                        AI Insights
+                    </h2>
+                    
+                    <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08); border-left: 4px solid #8b5cf6;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 20px; margin-right: 12px;">🌅</span>
+                            <span style="font-size: 16px; font-weight: 600; color: #6b46c1;">Morning Clarity</span>
+                        </div>
+                        <div style="font-size: 14px; color: #4c1d95; line-height: 1.5; margin-bottom: 10px;">
+                            Your morning sessions show 40% higher positivity and clearer goal articulation.
+                        </div>
+                        <div style="font-size: 12px; color: #8b5cf6; font-weight: 500; background: rgba(139, 92, 246, 0.08); padding: 6px 12px; border-radius: 20px; display: inline-block;">Set morning reminder</div>
+                    </div>
+
+                    <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08); border-left: 4px solid #8b5cf6;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 20px; margin-right: 12px;">📚</span>
+                            <span style="font-size: 16px; font-weight: 600; color: #6b46c1;">Growth Themes</span>
+                        </div>
+                        <div style="font-size: 14px; color: #4c1d95; line-height: 1.5; margin-bottom: 10px;">
+                            You've mentioned "learning" and "improvement" 15 times this month.
+                        </div>
+                        <div style="font-size: 12px; color: #8b5cf6; font-weight: 500; background: rgba(139, 92, 246, 0.08); padding: 6px 12px; border-radius: 20px; display: inline-block;">Explore growth resources</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showScreen('homeScreen')">
+                    <div class="nav-icon">🏠</div>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item active">
+                    <div class="nav-icon">📊</div>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item" onclick="showScreen('libraryScreen')">
+                    <div class="nav-icon">📚</div>
+                    <span>Library</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">⚙️</div>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Library Screen -->
+        <div class="screen" id="libraryScreen">
+            <div class="header">
+                <div class="header-content">
+                    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">Library</h1>
+                    <p style="font-size: 16px; opacity: 0.9; font-weight: 400;">Meditations to support your journey</p>
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="Search meditations...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="featured-meditation">
+                    <div style="background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Featured Today</div>
+                    <h3 class="featured-title">Morning Intention Setting</h3>
+                    <p class="featured-description">Start your day with clarity and purpose. Perfect before journaling your goals.</p>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 13px; opacity: 0.8;">
+                        <span>⏱️ 5 minutes</span>
+                        <span>🌱 Beginner</span>
+                        <span>🎯 Goals</span>
+                    </div>
+                    <button class="featured-play">
+                        <span style="margin-right: 8px;">▶️</span>
+                        <span>Start Meditation</span>
+                    </button>
+                </div>
+
+                <div style="margin-bottom: 35px;">
+                    <h2 style="font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 12px; font-size: 24px;">🧘‍♀️</span>
+                        Categories
+                    </h2>
+                    <div class="prompt-categories">
+                        <div class="category-card selected">
+                            <div class="category-icon">🎯</div>
+                            <div class="category-title">Goals</div>
+                            <div style="font-size: 11px; opacity: 0.8;">8 meditations</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">❤️</div>
+                            <div class="category-title">Emotions</div>
+                            <div style="font-size: 11px; opacity: 0.8;">12 meditations</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">💭</div>
+                            <div class="category-title">Reflection</div>
+                            <div style="font-size: 11px; opacity: 0.8;">10 meditations</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">🌱</div>
+                            <div class="category-title">Growth</div>
+                            <div style="font-size: 11px; opacity: 0.8;">15 meditations</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 style="font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 12px; font-size: 24px;">🎯</span>
+                        Goals Meditations
+                    </h2>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div class="meditation-item">
+                            <div class="meditation-header">
+                                <button class="meditation-play">▶️</button>
+                                <div style="flex: 1;">
+                                    <h3 class="meditation-title">Clarity & Focus</h3>
+                                    <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #8b5cf6;">
+                                        <span style="background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">⏱️ 3 min</span>
+                                        <span style="background: rgba(34, 197, 94, 0.1); color: #059669; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Beginner</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style="font-size: 14px; color: #6b46c1; line-height: 1.4; margin-top: 8px;">Center yourself before setting intentions. Perfect for morning journaling sessions.</p>
+                        </div>
+
+                        <div class="meditation-item">
+                            <div class="meditation-header">
+                                <button class="meditation-play">▶️</button>
+                                <div style="flex: 1;">
+                                    <h3 class="meditation-title">Future Self Visualization</h3>
+                                    <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #8b5cf6;">
+                                        <span style="background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">⏱️ 10 min</span>
+                                        <span style="background: rgba(251, 191, 36, 0.1); color: #d97706; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Intermediate</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style="font-size: 14px; color: #6b46c1; line-height: 1.4; margin-top: 8px;">Connect with your future self and gain insights into your path forward.</p>
+                        </div>
+
+                        <div class="meditation-item">
+                            <div class="meditation-header">
+                                <button class="meditation-play">▶️</button>
+                                <div style="flex: 1;">
+                                    <h3 class="meditation-title">Motivation Boost</h3>
+                                    <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #8b5cf6;">
+                                        <span style="background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">⏱️ 5 min</span>
+                                        <span style="background: rgba(34, 197, 94, 0.1); color: #059669; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">Beginner</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style="font-size: 14px; color: #6b46c1; line-height: 1.4; margin-top: 8px;">Reconnect with your why and reignite passion for your goals.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showScreen('homeScreen')">
+                    <div class="nav-icon">🏠</div>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="showScreen('analyticsScreen')">
+                    <div class="nav-icon">📊</div>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item active">
+                    <div class="nav-icon">📚</div>
+                    <span>Library</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">⚙️</div>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Screen -->
+        <div class="screen" id="timelineScreen">
+            <div class="header">
+                <div class="header-content">
+                    <button class="back-button" onclick="showScreen('analyticsScreen')">
+                        <span>←</span>
+                        <span>Back to Analytics</span>
+                    </button>
+                    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">Your Journal Sessions</h1>
+                    <p style="font-size: 16px; opacity: 0.9; font-weight: 400;">Listen to your voice journey</p>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 15px; font-size: 14px; opacity: 0.9;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>📊</span>
+                            <span>23 total sessions</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>⏱️</span>
+                            <span>156 min total</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="timeline">
+                    <div class="timeline-group">
+                        <div class="date-header">Today, June 5</div>
+                        
+                        <div class="journal-entry">
+                            <div style="position: absolute; top: 15px; right: 15px; background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 500;">7:42 / 10:00</div>
+                            <div class="entry-header">
+                                <div class="entry-meta">
+                                    <span class="entry-time">8:30 AM</span>
+                                    <span class="entry-category">🎯 Goals</span>
+                                </div>
+                                <h3 class="entry-title">Morning Goal Setting</h3>
+                                <p style="font-size: 14px; color: #6b46c1; font-style: italic; opacity: 0.8;">"What are three things you want to accomplish today?"</p>
+                            </div>
+                            <div class="audio-player">
+                                <div class="player-controls">
+                                    <button class="play-button">▶️</button>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 14px; color: #6b46c1; font-weight: 500;">7:42 minutes</div>
+                                        <div style="font-size: 12px; color: #8b5cf6; opacity: 0.8;">Good quality • Clear speech</div>
+                                    </div>
+                                </div>
+                                <div style="height: 40px; background: rgba(139, 92, 246, 0.1); border-radius: 8px; position: relative; margin-top: 10px;">
+                                    <div style="height: 100%; background: linear-gradient(90deg, #8b5cf6, #a855f7); width: 0%; border-radius: 8px;"></div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(139, 92, 246, 0.05); border-radius: 12px; padding: 15px; margin: 20px; border-left: 4px solid #8b5cf6;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6b46c1; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                                    <span>🧠</span>
+                                    <span>AI Insights</span>
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                                    <span style="background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;">Productivity Focus</span>
+                                    <span style="background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;">Goal Setting</span>
+                                </div>
+                                <div style="font-size: 13px; color: #4c1d95;">Mood: Focused and Determined (4.2/5)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-group">
+                        <div class="date-header">Yesterday, June 4</div>
+                        
+                        <div class="journal-entry">
+                            <div style="position: absolute; top: 15px; right: 15px; background: rgba(251, 191, 36, 0.1); color: #d97706; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 500;">9:15 / 10:00</div>
+                            <div class="entry-header">
+                                <div class="entry-meta">
+                                    <span class="entry-time">9:45 PM</span>
+                                    <span class="entry-category">💭 Reflection</span>
+                                </div>
+                                <h3 class="entry-title">Evening Reflection</h3>
+                                <p style="font-size: 14px; color: #6b46c1; font-style: italic; opacity: 0.8;">"What went well today and what could be improved?"</p>
+                            </div>
+                            <div class="audio-player">
+                                <div class="player-controls">
+                                    <button class="play-button">▶️</button>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 14px; color: #6b46c1; font-weight: 500;">9:15 minutes</div>
+                                        <div style="font-size: 12px; color: #8b5cf6; opacity: 0.8;">Good quality • Some background noise</div>
+                                    </div>
+                                </div>
+                                <div style="height: 40px; background: rgba(139, 92, 246, 0.1); border-radius: 8px; position: relative; margin-top: 10px;">
+                                    <div style="height: 100%; background: linear-gradient(90deg, #8b5cf6, #a855f7); width: 0%; border-radius: 8px;"></div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(139, 92, 246, 0.05); border-radius: 12px; padding: 15px; margin: 20px; border-left: 4px solid #8b5cf6;">
+                                <div style="font-size: 14px; font-weight: 600; color: #6b46c1; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                                    <span>🧠</span>
+                                    <span>AI Insights</span>
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                                    <span style="background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;">Self-Awareness</span>
+                                    <span style="background: rgba(139, 92, 246, 0.1); color: #6b46c1; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;">Gratitude</span>
+                                </div>
+                                <div style="font-size: 13px; color: #4c1d95;">Mood: Contemplative and Peaceful (3.8/5)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showScreen('homeScreen')">
+                    <div class="nav-icon">🏠</div>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item active">
+                    <div class="nav-icon">📊</div>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item" onclick="showScreen('libraryScreen')">
+                    <div class="nav-icon">📚</div>
+                    <span>Library</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">⚙️</div>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 'loginScreen';
+        let isRecording = false;
+        let selectedCategory = null;
+
+        // Screen Navigation
+        function showScreen(screenId) {
+            // Hide all screens first
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Small delay for smooth transition
+            setTimeout(() => {
+                const targetScreen = document.getElementById(screenId);
+                if (targetScreen) {
+                    targetScreen.classList.add('active');
+                    currentScreen = screenId;
+                    updateNavigation();
+                }
+            }, 100);
+        }
+
+        function updateNavigation() {
+            // Only update nav if we're not on auth screens
+            if (currentScreen === 'loginScreen' || currentScreen === 'signupScreen') {
+                return;
+            }
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const navMap = {
+                'homeScreen': 0,
+                'analyticsScreen': 1,
+                'timelineScreen': 1,
+                'libraryScreen': 2
+            };
+            
+            const activeIndex = navMap[currentScreen];
+            if (activeIndex !== undefined) {
+                const bottomNavs = document.querySelectorAll('.bottom-nav');
+                if (bottomNavs.length > 0) {
+                    const navItems = bottomNavs[0].querySelectorAll('.nav-item');
+                    if (navItems[activeIndex]) {
+                        navItems[activeIndex].classList.add('active');
+                    }
+                }
+            }
+        }
+
+        // Simple login functions
+        function doLogin() {
+            console.log('Login clicked');
+            const button = document.querySelector('#loginScreen .primary-button');
+            
+            button.textContent = 'Signing In...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                showNotification('Welcome to Rambl! 🎉');
+                showScreen('homeScreen');
+                button.textContent = 'Sign In';
+                button.disabled = false;
+            }, 1500);
+        }
+
+        function doSignup() {
+            console.log('Signup clicked');
+            const button = document.querySelector('#signupScreen .primary-button');
+            
+            button.textContent = 'Creating Account...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                showNotification('Account created! 🎉');
+                showScreen('homeScreen');
+                button.textContent = 'Create Account';
+                button.disabled = false;
+            }, 2000);
+        }
+
+        function quickLogin() {
+            console.log('Quick login');
+            showNotification('Welcome to Rambl Demo! 🎉');
+            showScreen('homeScreen');
+        }
+
+        // Category Selection
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.category-card')) {
+                const card = e.target.closest('.category-card');
+                const category = card.dataset.category;
+                
+                // Remove selection from all cards
+                document.querySelectorAll('.category-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // Add selection to clicked card
+                card.classList.add('selected');
+                selectedCategory = category;
+                
+                // Show feedback
+                showNotification(`Selected: ${card.querySelector('.category-title').textContent} 📝`);
+            }
+        });
+
+        // Voice Recording
+        document.getElementById('voiceButton')?.addEventListener('click', function() {
+            if (!selectedCategory) {
+                showNotification('Please select a prompt category first 📝');
+                return;
+            }
+            
+            if (!isRecording) {
+                // Start recording
+                isRecording = true;
+                this.innerHTML = '⏹️';
+                this.classList.add('recording');
+                showNotification('Recording started... 🎤');
+                
+                // Simulate 10-second recording
+                setTimeout(() => {
+                    if (isRecording) {
+                        stopRecording();
+                    }
+                }, 10000);
+            } else {
+                stopRecording();
+            }
+        });
+
+        function stopRecording() {
+            const button = document.getElementById('voiceButton');
+            isRecording = false;
+            button.innerHTML = '🎤';
+            button.classList.remove('recording');
+            showNotification('Recording saved! Check your analytics for insights 📊');
+        }
+
+        // Play Button Functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('play-button') || e.target.classList.contains('meditation-play') || e.target.closest('.featured-play')) {
+                const button = e.target.classList.contains('play-button') ? e.target : 
+                              e.target.classList.contains('meditation-play') ? e.target :
+                              e.target.closest('.featured-play');
+                
+                if (button.innerHTML.includes('▶️')) {
+                    button.innerHTML = button.innerHTML.replace('▶️', '⏸️');
+                    button.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                    showNotification('Playing... 🔊');
+                    
+                    // Auto-stop after 3 seconds for demo
+                    setTimeout(() => {
+                        button.innerHTML = button.innerHTML.replace('⏸️', '▶️');
+                        button.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)';
+                    }, 3000);
+                } else {
+                    button.innerHTML = button.innerHTML.replace('⏸️', '▶️');
+                    button.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)';
+                    showNotification('Paused ⏸️');
+                }
+            }
+        });
+
+        // Time Selector
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('time-option')) {
+                document.querySelectorAll('.time-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                
+                // Animate metrics
+                document.querySelectorAll('.metric-value').forEach(metric => {
+                    metric.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        metric.style.transform = 'scale(1)';
+                    }, 200);
+                });
+                
+                showNotification(`Showing ${e.target.textContent} data 📊`);
+            }
+        });
+
+        // Sessions Card Click (to Timeline)
+        document.addEventListener('click', function(e) {
+            const metricCard = e.target.closest('.metric-card');
+            if (metricCard && metricCard.querySelector('.metric-label')?.textContent === 'Sessions') {
+                showScreen('timelineScreen');
+                showNotification('Viewing your journal sessions 📖');
+            }
+        });
+
+        // Library Category Selection
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.category-card') && currentScreen === 'libraryScreen') {
+                const card = e.target.closest('.category-card');
+                
+                // Remove selection from all library cards
+                document.querySelectorAll('#libraryScreen .category-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // Add selection to clicked card
+                card.classList.add('selected');
+                
+                const categoryName = card.querySelector('.category-title').textContent;
+                showNotification(`Showing ${categoryName} meditations 🧘‍♀️`);
+            }
+        });
+
+        // Form Input Animations
+        document.addEventListener('focus', function(e) {
+            if (e.target.classList.contains('form-input')) {
+                e.target.style.transform = 'translateY(-2px)';
+            }
+        }, true);
+
+        document.addEventListener('blur', function(e) {
+            if (e.target.classList.contains('form-input')) {
+                e.target.style.transform = 'translateY(0)';
+            }
+        }, true);
+
+        // Hover Effects for Cards
+        document.addEventListener('mouseenter', function(e) {
+            if (e.target.classList.contains('metric-card')) {
+                e.target.style.transform = 'translateY(-5px)';
+                e.target.style.boxShadow = '0 8px 25px rgba(139, 92, 246, 0.15)';
+            }
+        }, true);
+
+        document.addEventListener('mouseleave', function(e) {
+            if (e.target.classList.contains('metric-card')) {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 20px rgba(139, 92, 246, 0.08)';
+            }
+        }, true);
+
+        // Search Functionality
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('search-input')) {
+                const searchTerm = e.target.value.toLowerCase();
+                if (searchTerm) {
+                    showNotification(`Searching for "${searchTerm}" 🔍`);
+                }
+            }
+        });
+
+        // Notification System
+        function showNotification(message) {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideDown 0.3s ease-out reverse';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Rambl app starting...');
+            
+            // Start with login screen
+            showScreen('loginScreen');
+            
+            // Add demo skip button immediately
+            const skipButton = document.createElement('button');
+            skipButton.textContent = '⚡ Skip to Demo';
+            skipButton.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: 1px solid rgba(255,255,255,0.3);
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                z-index: 1000;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            `;
+            skipButton.onmouseover = function() {
+                this.style.background = 'rgba(255,255,255,0.3)';
+            };
+            skipButton.onmouseout = function() {
+                this.style.background = 'rgba(255,255,255,0.2)';
+            };
+            skipButton.onclick = function() {
+                console.log('Skip button clicked');
+                quickLogin();
+            };
+            document.body.appendChild(skipButton);
+            
+            console.log('✅ App initialized - try clicking Sign In or Skip to Demo');
+        });
+
+        // Handle back button
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.back-button')) {
+                e.preventDefault();
+                if (currentScreen === 'timelineScreen') {
+                    showScreen('analyticsScreen');
+                }
+            }
+        });
+
+        // Prevent default form submissions
+        document.addEventListener('submit', function(e) {
+            e.preventDefault();
+        });
+
+        // Mobile touch improvements
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.classList.contains('category-card') || 
+                e.target.classList.contains('metric-card') ||
+                e.target.classList.contains('meditation-item')) {
+                e.target.style.transform = 'scale(0.98)';
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (e.target.classList.contains('category-card') || 
+                e.target.classList.contains('metric-card') ||
+                e.target.classList.contains('meditation-item')) {
+                setTimeout(() => {
+                    e.target.style.transform = 'scale(1)';
+                }, 150);
+            }
+        });
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && currentScreen === 'timelineScreen') {
+                showScreen('analyticsScreen');
+            }
+        });
+
+        // Demo mode indicator
+        setTimeout(() => {
+            console.log('🎉 Rambl Prototype Loaded!');
+            console.log('👆 Try interacting with all the elements');
+            console.log('📱 This is a fully interactive prototype');
+        }, 1000);
+    </script>
+</body>
+</html>-card" data-category="goals">
+                            <div class="category-icon">🎯</div>
+                            <div class="category-title">Goals</div>
+                            <div class="category-levels">5 Levels</div>
+                        </div>
+                        <div class="category-card" data-category="emotions">
+                            <div class="category-icon">❤️</div>
+                            <div class="category-title">Emotions</div>
+                            <div class="category-levels">6 Levels</div>
+                        </div>
+                        <div class="category
