@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rambl Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8f6ff 0%, #ede7ff 100%);
+            min-height: 100vh;
+            color: #2d1b69;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 50px rgba(106, 90, 205, 0.1);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 60px 30px 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .time-selector {
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 4px;
+            margin-top: 20px;
+        }
+
+        .time-option {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .time-option.active {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .main-content {
+            padding: 30px 20px 100px;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f8f6ff 0%, #f3f0ff 100%);
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .metric-card:hover::before {
+            left: 100%;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6b46c1;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+
+        .metric-change {
+            font-size: 11px;
+            margin-top: 5px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            color: #059669;
+            background: rgba(5, 150, 105, 0.1);
+        }
+
+        .metric-change.negative {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .chart-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #6b46c1;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-icon {
+            margin-right: 10px;
+            font-size: 22px;
+        }
+
+        .mood-chart {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            height: 180px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(to right, 
+                rgba(139, 92, 246, 0.1) 0%, 
+                rgba(168, 85, 247, 0.15) 25%,
+                rgba(139, 92, 246, 0.2) 50%,
+                rgba(168, 85, 247, 0.15) 75%,
+                rgba(139, 92, 246, 0.1) 100%);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .chart-line::after {
+            content: '';
+            position: absolute;
+            top: 30%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, #8b5cf6, #a855f7, #8b5cf6, #a855f7);
+            border-radius: 2px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #8b5cf6;
+        }
+
+        .insights-section {
+            margin-bottom: 30px;
+        }
+
+        .insight-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border-left: 4px solid #8b5cf6;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .insight-icon {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .insight-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #6b46c1;
+        }
+
+        .insight-description {
+            font-size: 14px;
+            color: #4c1d95;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .insight-action {
+            font-size: 12px;
+            color: #8b5cf6;
+            font-weight: 500;
+            background: rgba(139, 92, 246, 0.08);
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .topics-cloud {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .topic-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .topic-tag {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            color: #6b46c1;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .topic-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+
+        .topic-tag.large {
+            font-size: 15px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        .topic-tag.medium {
+            font-size: 14px;
+            padding: 9px 18px;
+        }
+
+        .recommendations-section {
+            margin-bottom: 30px;
+        }
+
+        .recommendation-card {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommendation-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .recommendation-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .recommendation-type {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .recommendation-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .recommendation-reason {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .recommendation-action {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .recommendation-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            padding: 15px 30px 30px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8b5cf6;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #6b46c1;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-dot:nth-child(1) { top: 15%; left: 8%; animation-delay: 0s; }
+        .floating-dot:nth-child(2) { top: 45%; right: 12%; animation-delay: 3s; }
+        .floating-dot:nth-child(3) { bottom: 25%; left: 15%; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-15px) rotate(180deg); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="floating-elements">
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+        </div>
+
+        <div class="header">
+            <div class="header-content">
+                <h1 class="header-title">Your Journey</h1>
+                <p class="header-subtitle">Insights from your voice</p>
+                <div class="time-selector">
+                    <div class="time-option">7D</div>
+                    <div class="time-option active">30D</div>
+                    <div class="time-option">90D</div>
+                    <div class="time-option">All</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Key Metrics -->
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-value">23</div>
+                    <div class="metric-label">Sessions</div>
+                    <div class="metric-change positive">+18%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">4.2</div>
+                    <div class="metric-label">Avg Mood</div>
+                    <div class="metric-change positive">+0.8</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label">Min Spoken</div>
+                    <div class="metric-change positive">+12%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">78%</div>
+                    <div class="metric-label">Positivity</div>
+                    <div class="metric-change positive">+15%</div>
+                </div>
+            </div>
+
+            <!-- Mood Trend -->
+            <div class="chart-section">
+                <h2 class="section-title">
+                    <span class="section-icon">📈</span>
+                    Emotional Journey
+                </h2>
+                <div class="mood-chart">
+                    <div class="chart-container">
+                        <div class="chart-line"></div>
+                    </div>
+                    <div class="chart-labels">
+                        <span>Week 1</span>
+                        <span>Week 2</span>
+                        <span>Week 3</span>
+                        <span>Week 4</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="insights-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🧠</span>
+                    AI Insights
+                </h2>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <span class="insight-icon">🌅</span>
+                        <span class="insight-title">Morning Clarity</span>
+                    </div>
+                    <div class="insight-description">
+                        Your morning sessions show 40% higher positivity and clearer goal articulation. Consider scheduling important reflections earlier in the day.
+                    </div>
+                    <div class="insight-action">Set morning reminder</div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <span class="insight-icon">📚</span>
+                        <span class="insight-title">Growth Themes</span>
+                    </div>
+                    <div class="insight-description">
+                        You've mentioned "learning" and "improvement" 15 times this month, showing strong growth mindset development.
+                    </div>
+                    <div class="insight-action">Explore growth resources</div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <span class="insight-icon">⚡</span>
+                        <span class="insight-title">Energy Patterns</span>
+                    </div>
+                    <div class="insight-description">
+                        Your speaking pace increases by 20% when discussing future goals, indicating genuine excitement about your aspirations.
+                    </div>
+                    <div class="insight-action">Focus on goal-setting</div>
+                </div>
+            </div>
+
+            <!-- Topic Cloud -->
+            <div class="chart-section">
+                <h2 class="section-title">
+                    <span class="section-icon">💭</span>
+                    What's on Your Mind
+                </h2>
+                <div class="topics-cloud">
+                    <div class="topic-tags">
+                        <span class="topic-tag large">Career Growth</span>
+                        <span class="topic-tag medium">Relationships</span>
+                        <span class="topic-tag">Health</span>
+                        <span class="topic-tag medium">Creativity</span>
+                        <span class="topic-tag">Mindfulness</span>
+                        <span class="topic-tag">Future Plans</span>
+                        <span class="topic-tag medium">Learning</span>
+                        <span class="topic-tag">Gratitude</span>
+                        <span class="topic-tag">Challenges</span>
+                        <span class="topic-tag">Self-Care</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendations-section">
+                <h2 class="section-title">
+                    <span class="section-icon">💡</span>
+                    Recommended for You
+                </h2>
+
+                <div class="recommendation-card">
+                    <div class="recommendation-content">
+                        <div class="recommendation-type">Book Recommendation</div>
+                        <div class="recommendation-title">"Atomic Habits" by James Clear</div>
+                        <div class="recommendation-reason">
+                            Based on your frequent mentions of wanting to build better routines and your goal-oriented mindset.
+                        </div>
+                        <button class="recommendation-action">Add to Reading List</button>
+                    </div>
+                </div>
+
+                <div class="recommendation-card">
+                    <div class="recommendation-content">
+                        <div class="recommendation-type">Meditation Practice</div>
+                        <div class="recommendation-title">Morning Gratitude Practice</div>
+                        <div class="recommendation-reason">
+                            Your morning sessions show highest positivity. A brief gratitude meditation could amplify this effect.
+                        </div>
+                        <button class="recommendation-action">Try 5-Minute Practice</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">📊</div>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📚</div>
+                <span>Library</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">⚙️</div>
+                <span>Settings</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Time selector functionality
+        document.querySelectorAll('.time-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.time-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Animate metrics update
+                document.querySelectorAll('.metric-value').forEach(metric => {
+                    metric.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        metric.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+        });
+
+        // Topic tag interactions
+        document.querySelectorAll('.topic-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    tag.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Insight card interactions
+        document.querySelectorAll('.insight-action').forEach(action => {
+            action.addEventListener('click', (e) => {
+                e.stopPropagation();
+                action.style.background = 'rgba(139, 92, 246, 0.2)';
+                action.textContent = 'Added ✓';
+                setTimeout(() => {
+                    action.style.background = 'rgba(139, 92, 246, 0.08)';
+                    action.textContent = action.getAttribute('data-original') || 'Completed';
+                }, 2000);
+            });
+        });
+
+        // Metric card hover effects
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.boxShadow = '0 8px 25px rgba(139, 92, 246, 0.15)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // Recommendation actions
+        document.querySelectorAll('.recommendation-action').forEach(button => {
+            button.addEventListener('click', () => {
+                button.style.background = 'rgba(255, 255, 255, 0.4)';
+                button.textContent = 'Added ✓';
+                setTimeout(() => {
+                    button.style.background = 'rgba(255, 255, 255, 0.2)';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
