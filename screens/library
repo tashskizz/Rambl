@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rambl Library - Meditations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8f6ff 0%, #ede7ff 100%);
+            min-height: 100vh;
+            color: #2d1b69;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 50px rgba(106, 90, 205, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 60px 30px 30px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .search-bar {
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .main-content {
+            padding: 30px 20px 100px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #6b46c1;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-icon {
+            margin-right: 12px;
+            font-size: 24px;
+        }
+
+        .view-all {
+            background: none;
+            border: none;
+            color: #8b5cf6;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .featured-meditation {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-meditation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .featured-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .featured-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .featured-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .featured-description {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .featured-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .featured-play {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+        }
+
+        .featured-play:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            border-color: #a855f7;
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2);
+        }
+
+        .category-card.active {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .category-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .category-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .category-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .category-count {
+            font-size: 12px;
+            opacity: 0.7;
+            font-weight: 500;
+        }
+
+        .meditation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .meditation-item {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .meditation-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .meditation-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .meditation-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .meditation-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .meditation-play {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .meditation-play:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .meditation-info {
+            flex: 1;
+        }
+
+        .meditation-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d1b69;
+            margin-bottom: 4px;
+        }
+
+        .meditation-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #8b5cf6;
+        }
+
+        .meditation-description {
+            font-size: 14px;
+            color: #6b46c1;
+            line-height: 1.4;
+            margin-top: 8px;
+        }
+
+        .duration-badge {
+            background: rgba(139, 92, 246, 0.1);
+            color: #6b46c1;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .difficulty-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .difficulty-badge.intermediate {
+            background: rgba(251, 191, 36, 0.1);
+            color: #d97706;
+        }
+
+        .difficulty-badge.advanced {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            padding: 15px 30px 30px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8b5cf6;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #6b46c1;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-dot:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-dot:nth-child(2) { top: 60%; right: 15%; animation-delay: 3s; }
+        .floating-dot:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+            50% { transform: translateY(-15px) rotate(180deg); opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="floating-elements">
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+        </div>
+
+        <div class="header">
+            <div class="header-content">
+                <h1 class="header-title">Library</h1>
+                <p class="header-subtitle">Meditations to support your journey</p>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="Search meditations...">
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Featured Meditation -->
+            <div class="featured-meditation">
+                <div class="featured-content">
+                    <div class="featured-badge">Featured Today</div>
+                    <h3 class="featured-title">Morning Intention Setting</h3>
+                    <p class="featured-description">Start your day with clarity and purpose. Perfect before journaling your goals.</p>
+                    <div class="featured-meta">
+                        <span>⏱️ 5 minutes</span>
+                        <span>🌱 Beginner</span>
+                        <span>🎯 Goals</span>
+                    </div>
+                    <button class="featured-play">
+                        <span>▶️</span>
+                        <span>Start Meditation</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">🧘‍♀️</span>
+                        Categories
+                    </h2>
+                </div>
+                <div class="categories-grid">
+                    <div class="category-card active" data-category="goals">
+                        <div class="category-icon">🎯</div>
+                        <div class="category-title">Goals</div>
+                        <div class="category-count">8 meditations</div>
+                    </div>
+                    <div class="category-card" data-category="emotions">
+                        <div class="category-icon">❤️</div>
+                        <div class="category-title">Emotions</div>
+                        <div class="category-count">12 meditations</div>
+                    </div>
+                    <div class="category-card" data-category="reflection">
+                        <div class="category-icon">💭</div>
+                        <div class="category-title">Reflection</div>
+                        <div class="category-count">10 meditations</div>
+                    </div>
+                    <div class="category-card" data-category="growth">
+                        <div class="category-icon">🌱</div>
+                        <div class="category-title">Growth</div>
+                        <div class="category-count">15 meditations</div>
+                    </div>
+                    <div class="category-card" data-category="future">
+                        <div class="category-icon">🔮</div>
+                        <div class="category-title">Future</div>
+                        <div class="category-count">6 meditations</div>
+                    </div>
+                    <div class="category-card" data-category="stress">
+                        <div class="category-icon">🕯️</div>
+                        <div class="category-title">Stress Relief</div>
+                        <div class="category-count">9 meditations</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meditations List -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">🎯</span>
+                        Goals Meditations
+                    </h2>
+                    <button class="view-all">View All</button>
+                </div>
+                <div class="meditation-list" id="meditationList">
+                    <div class="meditation-item">
+                        <div class="meditation-header">
+                            <button class="meditation-play">▶️</button>
+                            <div class="meditation-info">
+                                <h3 class="meditation-title">Clarity & Focus</h3>
+                                <div class="meditation-meta">
+                                    <span class="duration-badge">⏱️ 3 min</span>
+                                    <span class="difficulty-badge">Beginner</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="meditation-description">Center yourself before setting intentions. Perfect for morning journaling sessions.</p>
+                    </div>
+
+                    <div class="meditation-item">
+                        <div class="meditation-header">
+                            <button class="meditation-play">▶️</button>
+                            <div class="meditation-info">
+                                <h3 class="meditation-title">Obstacle Release</h3>
+                                <div class="meditation-meta">
+                                    <span class="duration-badge">⏱️ 7 min</span>
+                                    <span class="difficulty-badge intermediate">Intermediate</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="meditation-description">Release mental blocks and limiting beliefs that hold you back from your goals.</p>
+                    </div>
+
+                    <div class="meditation-item">
+                        <div class="meditation-header">
+                            <button class="meditation-play">▶️</button>
+                            <div class="meditation-info">
+                                <h3 class="meditation-title">Future Self Visualization</h3>
+                                <div class="meditation-meta">
+                                    <span class="duration-badge">⏱️ 10 min</span>
+                                    <span class="difficulty-badge intermediate">Intermediate</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="meditation-description">Connect with your future self and gain insights into your path forward.</p>
+                    </div>
+
+                    <div class="meditation-item">
+                        <div class="meditation-header">
+                            <button class="meditation-play">▶️</button>
+                            <div class="meditation-info">
+                                <h3 class="meditation-title">Motivation Boost</h3>
+                                <div class="meditation-meta">
+                                    <span class="duration-badge">⏱️ 5 min</span>
+                                    <span class="difficulty-badge">Beginner</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="meditation-description">Reconnect with your why and reignite passion for your goals.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📊</div>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">📚</div>
+                <span>Library</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">⚙️</div>
+                <span>Settings</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Meditation data for different categories
+        const meditationData = {
+            goals: [
+                {
+                    title: "Clarity & Focus",
+                    duration: "3 min",
+                    difficulty: "Beginner",
+                    description: "Center yourself before setting intentions. Perfect for morning journaling sessions."
+                },
+                {
+                    title: "Obstacle Release",
+                    duration: "7 min", 
+                    difficulty: "Intermediate",
+                    description: "Release mental blocks and limiting beliefs that hold you back from your goals."
+                },
+                {
+                    title: "Future Self Visualization",
+                    duration: "10 min",
+                    difficulty: "Intermediate", 
+                    description: "Connect with your future self and gain insights into your path forward."
+                },
+                {
+                    title: "Motivation Boost",
+                    duration: "5 min",
+                    difficulty: "Beginner",
+                    description: "Reconnect with your why and reignite passion for your goals."
+                }
+            ],
+            emotions: [
+                {
+                    title: "Emotional Awareness",
+                    duration: "5 min",
+                    difficulty: "Beginner",
+                    description: "Tune into your feelings without judgment. Great before emotional journaling."
+                },
+                {
+                    title: "Anxiety Relief",
+                    duration: "8 min",
+                    difficulty: "Beginner",
+                    description: "Calm racing thoughts and find peace in the present moment."
+                },
+                {
+                    title: "Joy Cultivation",
+                    duration: "6 min",
+                    difficulty: "Beginner",
+                    description: "Connect with feelings of gratitude and appreciation."
+                },
+                {
+                    title: "Anger Processing",
+                    duration: "12 min",
+                    difficulty: "Advanced",
+                    description: "Safely explore and release difficult emotions."
+                }
+            ],
+            reflection: [
+                {
+                    title: "Daily Review",
+                    duration: "4 min",
+                    difficulty: "Beginner",
+                    description: "Mindfully reflect on your day's experiences and lessons."
+                },
+                {
+                    title: "Inner Wisdom",
+                    duration: "15 min",
+                    difficulty: "Advanced",
+                    description: "Access deeper insights and intuitive knowing."
+                },
+                {
+                    title: "Gratitude Practice",
+                    duration: "3 min",
+                    difficulty: "Beginner",
+                    description: "Cultivate appreciation for life's blessings, big and small."
+                }
+            ],
+            growth: [
+                {
+                    title: "Growth Mindset",
+                    duration: "6 min",
+                    difficulty: "Beginner",
+                    description: "Embrace challenges as opportunities for learning and development."
+                },
+                {
+                    title: "Comfort Zone Expansion",
+                    duration: "9 min",
+                    difficulty: "Intermediate",
+                    description: "Build courage to step beyond familiar boundaries."
+                },
+                {
+                    title: "Self-Compassion",
+                    duration: "8 min",
+                    difficulty: "Intermediate",
+                    description: "Treat yourself with kindness during difficult times."
+                }
+            ],
+            future: [
+                {
+                    title: "Vision Meditation",
+                    duration: "12 min",
+                    difficulty: "Intermediate",
+                    description: "Explore possibilities and clarify your desired future."
+                },
+                {
+                    title: "Next Steps Clarity",
+                    duration: "5 min",
+                    difficulty: "Beginner",
+                    description: "Gain insight into your immediate next actions."
+                }
+            ],
+            stress: [
+                {
+                    title: "Quick Calm",
+                    duration: "2 min",
+                    difficulty: "Beginner",
+                    description: "Rapid stress relief for busy moments."
+                },
+                {
+                    title: "Deep Relaxation",
+                    duration: "20 min",
+                    difficulty: "Beginner",
+                    description: "Complete body and mind restoration."
+                },
+                {
+                    title: "Tension Release",
+                    duration: "7 min",
+                    difficulty: "Beginner",
+                    description: "Progressive muscle relaxation for physical stress."
+                }
+            ]
+        };
+
+        // Category icons
+        const categoryIcons = {
+            goals: "🎯",
+            emotions: "❤️", 
+            reflection: "💭",
+            growth: "🌱",
+            future: "🔮",
+            stress: "🕯️"
+        };
+
+        // Update meditation list based on selected category
+        function updateMeditationList(category) {
+            const sectionTitle = document.querySelector('.section-title');
+            const meditationList = document.getElementById('meditationList');
+            const meditations = meditationData[category];
+            
+            // Update section title
+            sectionTitle.innerHTML = `
+                <span class="section-icon">${categoryIcons[category]}</span>
+                ${category.charAt(0).toUpperCase() + category.slice(1)} Meditations
+            `;
+            
+            // Clear and rebuild meditation list
+            meditationList.innerHTML = '';
+            
+            meditations.forEach(meditation => {
+                const difficultyClass = meditation.difficulty.toLowerCase() === 'intermediate' ? 'intermediate' : 
+                                      meditation.difficulty.toLowerCase() === 'advanced' ? 'advanced' : '';
+                
+                const meditationItem = document.createElement('div');
+                meditationItem.className = 'meditation-item';
+                meditationItem.innerHTML = `
+                    <div class="meditation-header">
+                        <button class="meditation-play">▶️</button>
+                        <div class="meditation-info">
+                            <h3 class="meditation-title">${meditation.title}</h3>
+                            <div class="meditation-meta">
+                                <span class="duration-badge">⏱️ ${meditation.duration}</span>
+                                <span class="difficulty-badge ${difficultyClass}">${meditation.difficulty}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="meditation-description">${meditation.description}</p>
+                `;
+                
+                meditationList.appendChild(meditationItem);
+            });
+            
+            // Add click handlers to new meditation items
+            addMeditationClickHandlers();
+        }
+
+        // Category selection handling
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove active class from all cards
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked card
+                card.classList.add('active');
+                
+                // Update meditation list
+                const category = card.dataset.category;
+                updateMeditationList(category);
+            });
+        });
+
+        // Meditation play button handling
+        function addMeditationClickHandlers() {
+            document.querySelectorAll('.meditation-play').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const title = button.closest('.meditation-item').querySelector('.meditation-title').textContent;
+                    
+                    // Change to pause icon and show playing state
+                    button.innerHTML = '⏸️';
+                    button.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                    
+                    // Simulate meditation playing
+                    setTimeout(() => {
+                        button.innerHTML = '▶️';
+                        button.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)';
+                    }, 3000);
+                    
+                    // Show playing notification
+                    showNotification(`Playing: ${title}`);
+                });
+            });
+
+            document.querySelectorAll('.meditation-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    item.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        item.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        }
+
+        // Featured meditation play button
+        document.querySelector('.featured-play').addEventListener('click', () => {
+            const button = document.querySelector('.featured-play');
+            button.innerHTML = '<span>⏸️</span><span>Playing...</span>';
+            button.style.background = 'rgba(5, 150, 105, 0.3)';
+            
+            setTimeout(() => {
+                button.innerHTML = '<span>▶️</span><span>Start Meditation</span>';
+                button.style.background = 'rgba(255, 255, 255, 0.2)';
+            }, 3000);
+            
+            showNotification('Playing: Morning Intention Setting');
+        });
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const meditationItems = document.querySelectorAll('.meditation-item');
+            
+            meditationItems.
