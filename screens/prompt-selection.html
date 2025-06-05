@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rambl - Choose Your Prompt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8f6ff 0%, #ede7ff 100%);
+            min-height: 100vh;
+            color: #2d1b69;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 50px rgba(106, 90, 205, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 60px 30px 30px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .selected-category {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .category-icon {
+            font-size: 24px;
+        }
+
+        .category-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .category-info p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .main-content {
+            padding: 30px 20px 100px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #6b46c1;
+            text-align: center;
+        }
+
+        .difficulty-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            transition: all 0.5s ease;
+        }
+
+        .difficulty-grid.compact {
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-card {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 25px 20px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .difficulty-card.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            margin: 0;
+            padding: 0;
+            height: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .difficulty-card.compact {
+            padding: 15px 20px;
+            cursor: pointer;
+        }
+
+        .difficulty-card.compact .difficulty-header {
+            margin-bottom: 0;
+        }
+
+        .difficulty-card.compact .difficulty-examples {
+            display: none;
+        }
+
+        .difficulty-card:hover {
+            transform: translateY(-4px);
+            border-color: #a855f7;
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2);
+        }
+
+        .difficulty-card.hidden:hover {
+            transform: scale(0.95);
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        .difficulty-card.compact:hover {
+            transform: translateY(-2px);
+        }
+
+        .difficulty-card.selected {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+        }
+
+        .random-option {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 25px 20px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            width: 100%;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .random-option.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            margin: 0;
+            padding: 0;
+            height: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .prompt-display {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .prompt-display.visible {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 500px;
+            margin: 20px 0 30px 0;
+        }
+
+        .change-selection {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .change-button {
+            background: none;
+            border: none;
+            color: #8b5cf6;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .change-button:hover {
+            background: rgba(139, 92, 246, 0.1);
+            text-decoration: none;
+        }
+
+        .difficulty-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .difficulty-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .difficulty-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-icon {
+            font-size: 32px;
+        }
+
+        .difficulty-info {
+            flex: 1;
+        }
+
+        .difficulty-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .difficulty-description {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .difficulty-examples {
+            font-size: 12px;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            font-style: italic;
+        }
+
+        .difficulty-card.selected .difficulty-examples {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .random-option {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 25px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .random-option:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+        }
+
+        .random-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .random-option:hover::before {
+            transform: translateX(100%);
+        }
+
+        .random-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .random-icon {
+            font-size: 32px;
+        }
+
+        .random-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .random-description {
+            font-size: 14px;
+            opacity: 0.9;
+            text-align: center;
+        }
+
+        .prompt-display {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .prompt-display.visible {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .prompt-level {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .level-badge {
+            background: rgba(139, 92, 246, 0.1);
+            color: #6b46c1;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .level-badge.surface {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+        }
+
+        .level-badge.medium {
+            background: rgba(251, 191, 36, 0.1);
+            color: #d97706;
+        }
+
+        .level-badge.deep {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .prompt-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d1b69;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .prompt-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .action-button {
+            background: none;
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        .action-button.primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .action-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .continue-button {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            display: none;
+        }
+
+        .continue-button.visible {
+            display: block;
+        }
+
+        .continue-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-dot:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-dot:nth-child(2) { top: 60%; right: 15%; animation-delay: 3s; }
+        .floating-dot:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+            50% { transform: translateY(-15px) rotate(180deg); opacity: 0.6; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.3);
+            z-index: 1000;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="floating-elements">
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+        </div>
+
+        <div class="header">
+            <div class="header-content">
+                <button class="back-button" onclick="goBack()">
+                    <span>←</span>
+                    <span>Back to Categories</span>
+                </button>
+                
+                <div class="selected-category" id="selectedCategory">
+                    <div class="category-icon">🎯</div>
+                    <div class="category-info">
+                        <h3>Goals</h3>
+                        <p>Focus on your aspirations and achievements</p>
+                    </div>
+                </div>
+
+                <h1 class="header-title">Choose Your Depth</h1>
+                <p class="header-subtitle">How deep do you want to go today?</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="section">
+                <div class="difficulty-grid">
+                    <div class="difficulty-card" data-level="surface" onclick="selectDifficulty('surface')">
+                        <div class="difficulty-header">
+                            <div class="difficulty-icon">🌱</div>
+                            <div class="difficulty-info">
+                                <h3 class="difficulty-title">Surface Level</h3>
+                                <p class="difficulty-description">Quick check-ins and simple reflections</p>
+                            </div>
+                        </div>
+                        <div class="difficulty-examples">"What's one thing that went well today?"</div>
+                    </div>
+
+                    <div class="difficulty-card" data-level="medium" onclick="selectDifficulty('medium')">
+                        <div class="difficulty-header">
+                            <div class="difficulty-icon">🌿</div>
+                            <div class="difficulty-info">
+                                <h3 class="difficulty-title">Medium Depth</h3>
+                                <p class="difficulty-description">Thoughtful exploration of your experiences</p>
+                            </div>
+                        </div>
+                        <div class="difficulty-examples">"What patterns do you notice in your goal-setting?"</div>
+                    </div>
+
+                    <div class="difficulty-card" data-level="deep" onclick="selectDifficulty('deep')">
+                        <div class="difficulty-header">
+                            <div class="difficulty-icon">🌳</div>
+                            <div class="difficulty-info">
+                                <h3 class="difficulty-title">Deep Dive</h3>
+                                <p class="difficulty-description">Profound self-discovery and insight</p>
+                            </div>
+                        </div>
+                        <div class="difficulty-examples">"How do your current goals align with your core values?"</div>
+                    </div>
+                </div>
+
+                <button class="random-option" id="randomOption" onclick="selectRandom()">
+                    <div class="random-header">
+                        <div class="random-icon">🎲</div>
+                        <div class="random-title">Surprise Me</div>
+                    </div>
+                    <p class="random-description">Let Rambl choose a question at any depth for you</p>
+                </button>
+            </div>
+
+            <div class="prompt-display" id="promptDisplay">
+                <div class="prompt-level">
+                    <span class="level-badge" id="levelBadge">Medium</span>
+                    <span id="promptCategory">Goals Question</span>
+                </div>
+                <div class="prompt-text" id="promptText">
+                    What's one goal you've been putting off, and what's the first small step you could take today?
+                </div>
+                <div class="prompt-actions">
+                    <button class="action-button" onclick="shufflePrompt()">
+                        <span>🔄</span>
+                        <span>New Question</span>
+                    </button>
+                    <button class="action-button primary" onclick="startRecording()">
+                        <span>🎤</span>
+                        <span>Start Recording</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="change-selection" id="changeSelection" style="display: none;">
+                <button class="change-button" onclick="resetSelection()">
+                    ← Change difficulty level
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedLevel = null;
+        let currentCategory = 'goals';
+
+        // Prompt database
+        const prompts = {
+            goals: {
+                surface: [
+                    "What's one goal you're excited about today?",
+                    "Name a small win you had this week.",
+                    "What's one task you want to complete today?",
+                    "How are you feeling about your progress lately?",
+                    "What's motivating you right now?"
+                ],
+                medium: [
+                    "What's one goal you've been putting off, and what's the first small step you could take today?",
+                    "How do you typically celebrate when you reach a milestone?",
+                    "What patterns do you notice in your goal-setting process?",
+                    "Which goal would make the biggest difference in your life right now?",
+                    "What's one limiting belief that's holding you back from your goals?"
+                ],
+                deep: [
+                    "How do your current goals align with your core values and who you want to become?",
+                    "What would you pursue if you knew you couldn't fail, and what does that reveal about your true desires?",
+                    "How has your definition of success evolved over the years?",
+                    "What legacy do you want to leave, and how do your current goals contribute to that?",
+                    "If you could only achieve three things in your lifetime, what would they be and why?"
+                ]
+            },
+            emotions: {
+                surface: [
+                    "How are you feeling right now in one word?",
+                    "What's bringing you joy today?",
+                    "Rate your energy level from 1-10.",
+                    "What's one thing that made you smile recently?",
+                    "How's your mood compared to yesterday?"
+                ],
+                medium: [
+                    "What emotion have you been avoiding, and why might that be?",
+                    "How do you typically handle stress, and is it working for you?",
+                    "What triggers tend to affect your mood the most?",
+                    "When do you feel most like yourself?",
+                    "What's an emotion you'd like to experience more often?"
+                ],
+                deep: [
+                    "How do your emotions guide your decision-making, and is this serving you?",
+                    "What patterns do you notice in your emotional responses to different situations?",
+                    "How has your relationship with your emotions changed over time?",
+                    "What would it look like to fully accept and honor all of your feelings?",
+                    "If your emotions could speak, what wisdom would they share with you?"
+                ]
+            },
+            reflection: {
+                surface: [
+                    "What's one thing that went well today?",
+                    "What are you grateful for right now?",
+                    "What's one lesson you learned recently?",
+                    "How did you grow today?",
+                    "What's one positive change you've noticed in yourself?"
+                ],
+                medium: [
+                    "What's a recent experience that challenged your perspective?",
+                    "How have you changed in the last month?",
+                    "What's a pattern in your life you're becoming more aware of?",
+                    "What would you tell your past self from a year ago?",
+                    "What's something you used to believe that you no longer hold true?"
+                ],
+                deep: [
+                    "What themes keep appearing in your life, and what might they be trying to teach you?",
+                    "How do the different aspects of your identity influence each other?",
+                    "What would your wisest self advise you about your current situation?",
+                    "What parts of yourself are you still discovering?",
+                    "How has adversity shaped who you are today?"
+                ]
+            },
+            growth: {
+                surface: [
+                    "What's one skill you'd like to improve?",
+                    "What did you learn today?",
+                    "How did you step outside your comfort zone recently?",
+                    "What's one area where you see yourself improving?",
+                    "What's inspiring your growth right now?"
+                ],
+                medium: [
+                    "What's a challenge that's actually helping you grow?",
+                    "How do you know when you're ready for the next level?",
+                    "What growth mindset shift has made the biggest difference for you?",
+                    "Where do you feel stuck, and what might help you move forward?",
+                    "What's something you're learning to accept about yourself?"
+                ],
+                deep: [
+                    "How do you define personal growth, and how has this definition evolved?",
+                    "What would growth look like if you weren't comparing yourself to others?",
+                    "How do your struggles contribute to your becoming?",
+                    "What aspects of yourself are you still integrating or accepting?",
+                    "If growth meant letting go rather than acquiring, what would you release?"
+                ]
+            },
+            future: {
+                surface: [
+                    "What are you looking forward to this week?",
+                    "What's one thing you want to try soon?",
+                    "How do you picture your ideal day?",
+                    "What's exciting you about the future?",
+                    "What's one hope you have for tomorrow?"
+                ],
+                medium: [
+                    "Where do you see yourself in five years, and what steps are you taking to get there?",
+                    "What kind of person do you want to become?",
+                    "What legacy do you want to leave behind?",
+                    "How do you balance planning with staying present?",
+                    "What's one dream you're afraid to pursue?"
+                ],
+                deep: [
+                    "If you could design your life with no limitations, what would it look like?",
+                    "How do you want to be remembered by those closest to you?",
+                    "What would you regret not exploring or experiencing?",
+                    "How do your past experiences inform your vision for the future?",
+                    "What calling or purpose feels most authentic to you?"
+                ]
+            }
+        };
+
+        // Category information
+        const categoryInfo = {
+            goals: { icon: '🎯', title: 'Goals', description: 'Focus on your aspirations and achievements' },
+            emotions: { icon: '❤️', title: 'Emotions', description: 'Explore your feelings and emotional patterns' },
+            reflection: { icon: '💭', title: 'Reflection', description: 'Look back and find meaning in your experiences' },
+            growth: { icon: '🌱', title: 'Growth', description: 'Discover how you\'re evolving and learning' },
+            future: { icon: '🔮', title: 'Future', description: 'Envision and plan for what\'s ahead' }
+        };
+
+        // Initialize page with category (in real app this would come from navigation)
+        function initializePage(category = 'goals') {
+            currentCategory = category;
+            const info = categoryInfo[category];
+            
+            document.getElementById('selectedCategory').innerHTML = `
+                <div class="category-icon">${info.icon}</div>
+                <div class="category-info">
+                    <h3>${info.title}</h3>
+                    <p>${info.description}</p>
+                </div>
+            `;
+        }
+
+        // Select difficulty level
+        function selectDifficulty(level) {
+            selectedLevel = level;
+            
+            // Update selected card
+            document.querySelectorAll('.difficulty-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.level !== level) {
+                    card.classList.add('hidden');
+                } else {
+                    card.classList.add('compact');
+                }
+            });
+            
+            // Hide random option
+            document.getElementById('randomOption').classList.add('hidden');
+            
+            // Make grid more compact
+            document.querySelector('.difficulty-grid').classList.add('compact');
+            
+            // Select the chosen card
+            document.querySelector(`[data-level="${level}"]`).classList.add('selected');
+            
+            // Show prompt right after the selected card
+            setTimeout(() => {
+                showPrompt(level);
+                document.getElementById('changeSelection').style.display = 'block';
+            }, 250);
+        }
+
+        // Select random difficulty and prompt
+        function selectRandom() {
+            const levels = ['surface', 'medium', 'deep'];
+            const randomLevel = levels[Math.floor(Math.random() * levels.length)];
+            
+            // Visual feedback for random selection
+            const randomButton = document.querySelector('.random-option');
+            randomButton.style.transform = 'scale(0.98)';
+            
+            setTimeout(() => {
+                randomButton.style.transform = 'scale(1)';
+                selectDifficulty(randomLevel);
+                showNotification(`🎲 Random ${randomLevel} question selected!`);
+            }, 150);
+        }
+
+        // Reset selection to show all options again
+        function resetSelection() {
+            selectedLevel = null;
+            
+            // Show all cards again
+            document.querySelectorAll('.difficulty-card').forEach(card => {
+                card.classList.remove('selected', 'hidden', 'compact');
+            });
+            
+            // Show random option
+            document.getElementById('randomOption').classList.remove('hidden');
+            
+            // Reset grid
+            document.querySelector('.difficulty-grid').classList.remove('compact');
+            
+            // Hide prompt and change button
+            document.getElementById('promptDisplay').classList.remove('visible');
+            document.getElementById('changeSelection').style.display = 'none';
+            
+            showNotification('↻ Selection reset');
+        }
+
+        // Show prompt for selected level
+        function showPrompt(level) {
+            const prompts_array = prompts[currentCategory][level];
+            const randomPrompt = prompts_array[Math.floor(Math.random() * prompts_array.length)];
+            
+            // Update prompt display
+            const levelBadge = document.getElementById('levelBadge');
+            levelBadge.textContent = level.charAt(0).toUpperCase() + level.slice(1);
+            levelBadge.className = `level-badge ${level}`;
+            
+            document.getElementById('promptCategory').textContent = `${categoryInfo[currentCategory].title} Question`;
+            document.getElementById('promptText').textContent = randomPrompt;
+            
+            // Show prompt display with animation
+            const promptDisplay = document.getElementById('promptDisplay');
+            promptDisplay.classList.add('visible');
+        }
+
+        // Shuffle to new prompt of same level
+        function shufflePrompt() {
+            if (selectedLevel) {
+                // Brief animation
+                const promptDisplay = document.getElementById('promptDisplay');
+                promptDisplay.style.transform = 'translateX(-10px)';
+                
+                setTimeout(() => {
+                    showPrompt(selectedLevel);
+                    promptDisplay.style.transform = 'translateX(0)';
+                    showNotification('🔄 New question selected!');
+                }, 150);
+            }
+        }
+
+        // Start recording
+        function startRecording() {
+            showNotification('🎤 Recording started! (This would normally navigate to recording screen)');
+            // In real app: navigate to recording screen with selected prompt
+        }
+
+        // Go back to category selection
+        function goBack() {
+            showNotification('← Returning to categories');
+            // In real app: navigate back to home screen
+        }
+
+        // Notification system
+        function showNotification(message) {
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideDown 0.3s ease-out reverse';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Touch interactions for mobile
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.closest('.difficulty-card') || e.target.closest('.random-option')) {
+                e.target.closest('.difficulty-card, .random-option').style.transform = 'scale(0.98)';
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (e.target.closest('.difficulty-card') || e.target.closest('.random-option')) {
+                setTimeout(() => {
+                    const element = e.target.closest('.difficulty-card, .random-option');
+                    if (element) element.style.transform = 'scale(1)';
+                }, 150);
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage('goals'); // Default to goals, in real app this would be passed from previous screen
+        });
+    </script>
+</body>
+</html>
