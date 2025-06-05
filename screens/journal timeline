@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rambl - Your Journal Sessions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8f6ff 0%, #ede7ff 100%);
+            min-height: 100vh;
+            color: #2d1b69;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 50px rgba(106, 90, 205, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 60px 30px 30px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-2px);
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 4px;
+            margin-top: 20px;
+        }
+
+        .filter-tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-tab.active {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .main-content {
+            padding: 30px 20px 100px;
+        }
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #8b5cf6, #a855f7, #8b5cf6);
+            opacity: 0.3;
+        }
+
+        .timeline-group {
+            margin-bottom: 35px;
+        }
+
+        .date-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #6b46c1;
+            margin-bottom: 20px;
+            padding-left: 60px;
+            position: relative;
+        }
+
+        .date-header::before {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #8b5cf6;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        .journal-entry {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            margin-left: 60px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .journal-entry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .journal-entry::before {
+            content: '';
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #a855f7;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.3);
+        }
+
+        .entry-header {
+            padding: 20px 20px 15px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .entry-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .entry-time {
+            font-size: 14px;
+            color: #8b5cf6;
+            font-weight: 500;
+        }
+
+        .entry-category {
+            background: rgba(139, 92, 246, 0.1);
+            color: #6b46c1;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .entry-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d1b69;
+            margin-bottom: 8px;
+        }
+
+        .entry-prompt {
+            font-size: 14px;
+            color: #6b46c1;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .entry-content {
+            padding: 0 20px 20px;
+        }
+
+        .audio-player {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .play-button.playing {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .audio-duration {
+            font-size: 14px;
+            color: #6b46c1;
+            font-weight: 500;
+        }
+
+        .audio-quality {
+            font-size: 12px;
+            color: #8b5cf6;
+            opacity: 0.8;
+        }
+
+        .waveform {
+            height: 40px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .waveform-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 8px;
+        }
+
+        .waveform-bars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: end;
+            gap: 1px;
+            padding: 5px;
+        }
+
+        .waveform-bar {
+            flex: 1;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 1px;
+            min-height: 2px;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        .waveform-bar:nth-child(odd) { animation-delay: 0.1s; }
+        .waveform-bar:nth-child(even) { animation-delay: 0.2s; }
+
+        @keyframes wave {
+            0%, 100% { height: 20%; }
+            50% { height: 100%; }
+        }
+
+        .entry-insights {
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b46c1;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .insight-tag {
+            background: rgba(139, 92, 246, 0.1);
+            color: #6b46c1;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .insight-mood {
+            font-size: 13px;
+            color: #4c1d95;
+        }
+
+        .entry-actions {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            background: none;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-button:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #8b5cf6;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .load-more {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .load-more-button {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            color: #6b46c1;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .load-more-button:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+
+        .recording-limit-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(139, 92, 246, 0.1);
+            color: #6b46c1;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .recording-limit-indicator.warning {
+            background: rgba(251, 191, 36, 0.1);
+            color: #d97706;
+        }
+
+        .recording-limit-indicator.limit-reached {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            padding: 15px 30px 30px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8b5cf6;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #6b46c1;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-dot:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-dot:nth-child(2) { top: 60%; right: 15%; animation-delay: 3s; }
+        .floating-dot:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+            50% { transform: translateY(-15px) rotate(180deg); opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="floating-elements">
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+            <div class="floating-dot"></div>
+        </div>
+
+        <div class="header">
+            <div class="header-content">
+                <button class="back-button" onclick="goBack()">
+                    <span>←</span>
+                    <span>Back to Analytics</span>
+                </button>
+                <h1 class="header-title">Your Journal Sessions</h1>
+                <p class="header-subtitle">Listen to your voice journey</p>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span>📊</span>
+                        <span>23 total sessions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>⏱️</span>
+                        <span>156 min total</span>
+                    </div>
+                </div>
+                <div class="filter-tabs">
+                    <div class="filter-tab active" data-filter="all">All</div>
+                    <div class="filter-tab" data-filter="week">This Week</div>
+                    <div class="filter-tab" data-filter="month">This Month</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="timeline" id="timeline">
+                <!-- Today's Entries -->
+                <div class="timeline-group">
+                    <div class="date-header">Today, June 5</div>
+                    
+                    <div class="journal-entry">
+                        <div class="recording-limit-indicator">7:42 / 10:00</div>
+                        <div class="entry-header">
+                            <div class="entry-meta">
+                                <span class="entry-time">8:30 AM</span>
+                                <span class="entry-category">🎯 Goals</span>
+                            </div>
+                            <h3 class="entry-title">Morning Goal Setting</h3>
+                            <p class="entry-prompt">"What are three things you want to accomplish today?"</p>
+                        </div>
+                        <div class="entry-content">
+                            <div class="audio-player">
+                                <div class="player-controls">
+                                    <button class="play-button" onclick="togglePlay(this)">▶️</button>
+                                    <div class="player-info">
+                                        <div class="audio-duration">7:42 minutes</div>
+                                        <div class="audio-quality">Good quality • Clear speech</div>
+                                    </div>
+                                </div>
+                                <div class="waveform">
+                                    <div class="waveform-progress" id="progress1"></div>
+                                    <div class="waveform-bars">
+                                        <div class="waveform-bar" style="height: 60%;"></div>
+                                        <div class="waveform-bar" style="height: 80%;"></div>
+                                        <div class="waveform-bar" style="height: 40%;"></div>
+                                        <div class="waveform-bar" style="height: 90%;"></div>
+                                        <div class="waveform-bar" style="height: 50%;"></div>
+                                        <div class="waveform-bar" style="height: 70%;"></div>
+                                        <div class="waveform-bar" style="height: 85%;"></div>
+                                        <div class="waveform-bar" style="height: 45%;"></div>
+                                        <div class="waveform-bar" style="height: 75%;"></div>
+                                        <div class="waveform-bar" style="height: 55%;"></div>
+                                        <div class="waveform-bar" style="height: 65%;"></div>
+                                        <div class="waveform-bar" style="height: 35%;"></div>
+                                        <div class="waveform-bar" style="height: 80%;"></div>
+                                        <div class="waveform-bar" style="height: 60%;"></div>
+                                        <div class="waveform-bar" style="height: 90%;"></div>
+                                        <div class="waveform-bar" style="height: 30%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="entry-insights">
+                                <div class="insight-title">
+                                    <span>🧠</span>
+                                    <span>AI Insights</span>
+                                </div>
+                                <div class="insight-tags">
+                                    <span class="insight-tag">Productivity Focus</span>
+                                    <span class="insight-tag">Project Planning</span>
+                                    <span class="insight-tag">Time Management</span>
+                                </div>
+                                <div class="insight-mood">Mood: Focused and Determined (4.2/5)</div>
+                            </div>
+                        </div>
+                        <div class="entry-actions">
+                            <button class="action-button">
+                                <span>💾</span>
+                                <span>Save to Highlights</span>
+                            </button>
+                            <button class="action-button">
+                                <span>📝</span>
+                                <span>View Transcript</span>
+                            </button>
+                            <button class="action-button">
+                                <span>🔗</span>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yesterday's Entries -->
+                <div class="timeline-group">
+                    <div class="date-header">Yesterday, June 4</div>
+                    
+                    <div class="journal-entry">
+                        <div class="recording-limit-indicator warning">9:15 / 10:00</div>
+                        <div class="entry-header">
+                            <div class="entry-meta">
+                                <span class="entry-time">9:45 PM</span>
+                                <span class="entry-category">💭 Reflection</span>
+                            </div>
+                            <h3 class="entry-title">Evening Reflection</h3>
+                            <p class="entry-prompt">"What went well today and what could be improved?"</p>
+                        </div>
+                        <div class="entry-content">
+                            <div class="audio-player">
+                                <div class="player-controls">
+                                    <button class="play-button" onclick="togglePlay(this)">▶️</button>
+                                    <div class="player-info">
+                                        <div class="audio-duration">9:15 minutes</div>
+                                        <div class="audio-quality">Good quality • Some background noise</div>
+                                    </div>
+                                </div>
+                                <div class="waveform">
+                                    <div class="waveform-progress" id="progress2"></div>
+                                    <div class="waveform-bars">
+                                        <div class="waveform-bar" style="height: 45%;"></div>
+                                        <div class="waveform-bar" style="height: 65%;"></div>
+                                        <div class="waveform-bar" style="height: 80%;"></div>
+                                        <div class="waveform-bar" style="height: 50%;"></div>
+                                        <div class="waveform-bar" style="height: 75%;"></div>
+                                        <div class="waveform-bar" style="height: 60%;"></div>
+                                        <div class="waveform-bar" style="height: 85%;"></div>
+                                        <div class="waveform-bar" style="height: 40%;"></div>
+                                        <div class="waveform-bar" style="height: 70%;"></div>
+                                        <div class="waveform-bar" style="height: 55%;"></div>
+                                        <div class="waveform-bar" style="height: 90%;"></div>
+                                        <div class="waveform-bar" style="height: 35%;"></div>
+                                        <div class="waveform-bar" style="height: 75%;"></div>
+                                        <div class="waveform-bar" style="height: 50%;"></div>
+                                        <div class="waveform-bar" style="height: 65%;"></div>
+                                        <div class="waveform-bar" style="height: 80%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="entry-insights">
+                                <div class="insight-title">
+                                    <span>🧠</span>
+                                    <span>AI Insights</span>
+                                </div>
+                                <div class="insight-tags">
+                                    <span class="insight-tag">Self-Awareness</span>
+                                    <span class="insight-tag">Progress Review</span>
+                                    <span class="insight-tag">Gratitude</span>
+                                </div>
+                                <div class="insight-mood">Mood: Contemplative and Peaceful (3.8/5)</div>
+                            </div>
+                        </div>
+                        <div class="entry-actions">
+                            <button class="action-button">
+                                <span>💾</span>
+                                <span>Save to Highlights</span>
+                            </button>
+                            <button class="action-button">
+                                <span>📝</span>
+                                <span>View Transcript</span>
+                            </button>
+                            <button class="action-button">
+                                <span>🔗</span>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="journal-entry">
+                        <div class="recording-limit-indicator">3:22 / 10:00</div>
+                        <div class="entry-header">
+                            <div class="entry-meta">
+                                <span class="entry-time">2:15 PM</span>
+                                <span class="entry-category">❤️ Emotions</span>
+                            </div>
+                            <h3 class="entry-title">Midday Check-in</h3>
+                            <p class="entry-prompt">"How are you feeling right now and why?"</p>
+                        </div>
+                        <div class="entry-content">
+                            <div class="audio-player">
+                                <div class="player-controls">
+                                    <button class="play-button" onclick="togglePlay(this)">▶️</button>
+                                    <div class="player-info">
+                                        <div class="audio-duration">3:22 minutes</div>
+                                        <div class="audio-quality">Excellent quality • Clear speech</div>
+                                    </div>
+                                </div>
+                                <div class="waveform">
+                                    <div class="waveform-progress" id="progress3"></div>
+                                    <div class="waveform-bars">
+                                        <div class="waveform-bar" style="height: 70%;"></div>
+                                        <div class="waveform-bar" style="height: 50%;"></div>
+                                        <div class="waveform-bar" style="height: 85%;"></div>
+                                        <div class="waveform-bar" style="height: 65%;"></div>
+                                        <div class="waveform-bar" style="height: 40%;"></div>
+                                        <div class="waveform-bar" style="height: 75%;"></div>
+                                        <div class="waveform-bar" style="height: 90%;"></div>
+                                        <div class="waveform-bar" style="height: 55%;"></div>
+                                        <div class="waveform-bar" style="height: 60%;"></div>
+                                        <div class="waveform-bar" style="height: 80%;"></div>
+                                        <div class="waveform-bar" style="height: 45%;"></div>
+                                        <div class="waveform-bar" style="height: 70%;"></div>
+                                        <div class="waveform-bar" style="height: 35%;"></div>
+                                        <div class="waveform-bar" style="height: 85%;"></div>
+                                        <div class="waveform-bar" style="height: 60%;"></div>
+                                        <div class="waveform-bar" style="height: 75%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="entry-insights">
+                                <div class="insight-title">
+                                    <span>🧠</span>
+                                    <span>AI Insights</span>
+                                </div>
+                                <div class="insight-tags">
+                                    <span class="insight-tag">Stress Management</span>
+                                    <span class="insight-tag">Work-Life Balance</span>
+                                </div>
+                                <div class="insight-mood">Mood: Slightly Overwhelmed (2.8/5)</div>
+                            </div>
+                        </div>
+                        <div class="entry-actions">
+                            <button class="action-button">
+                                <span>💾</span>
+                                <span>Save to Highlights</span>
+                            </button>
+                            <button class="action-button">
+                                <span>📝</span>
+                                <span>View Transcript</span>
+                            </button>
+                            <button class="action-button">
+                                <span>🔗</span>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earlier This Week -->
+                <div class="timeline-group">
+                    <div class="date-header">Monday, June 2</div>
+                    
+                    <div class="journal-entry">
+                        <div class="recording-limit-indicator limit-reached">10:00 / 10:00</div>
+                        <div class="entry-header">
+                            <div class="entry-meta">
+                                <span class="entry-time">7:00 AM</span>
+                                <span class="entry-category">🌱 Growth</span>
+                            </div>
+                            <h3 class="entry-title">Weekly Goal Setting</h3>
+                            <p class="entry-prompt">"What do you want to learn or improve this week?"</p>
+                        </div>
+                        <div class="entry-content">
+                            <div class="audio-player">
+                                <div class="player-controls">
+                                    <button class="play-button" onclick="togglePlay(this)">▶️</button>
+                                    <div class="player-info">
+                                        <div class="audio-duration">10:00 minutes (limit reached)</div>
+                                        <div class="audio-quality">Good quality • Comprehensive session</div>
+                                    </div>
+                                </div>
+                                <div class="waveform">
+                                    <div class="waveform-progress" id="progress4"></div>
+                                    <div class="waveform-bars">
+                                        <div class="waveform-bar" style="height: 60%;"></div>
+                                        <div class="waveform-bar" style="height: 80%;"></div>
+                                        <div class="waveform-bar" style="height: 70%;"></div>
+                                        <div class="waveform-bar" style="height: 90%;"></div>
+                                        <div class="waveform-bar" style="height: 50%;"></div>
+                                        <div class="waveform-bar" style="height: 85%;"></div>
+                                        <div class="waveform-bar" style="height: 65%;"></div>
+                                        <div class="waveform-bar" style="height: 75%;"></div>
+                                        <div class="waveform-bar" style="height: 55%;"></div>
+                                        <div class="waveform-bar" style="height: 95%;"></div>
+                                        <div class="waveform-bar" style="height: 45%;"></div>
+                                        <div class="waveform-bar" style="height: 80%;"></div>
+                                        <div class="waveform-bar" style="height: 70%;"></div>
+                                        <div class="waveform-bar" style="height: 85%;"></div>
+                                        <div class="waveform-bar" style="height: 40%;"></div>
+                                        <div class="waveform-bar" style="height: 75%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="entry-insights">
+                                <div class="insight-title">
+                                    <span>🧠</span>
+                                    <span>AI Insights</span>
+                                </div>
+                                <div class="insight-tags">
+                                    <span class="insight-tag">Learning Goals</span>
+                                    <span class="insight-tag">Skill Development</span>
+                                    <span class="insight-tag">Career Growth</span>
+                                </div>
+                                <div class="insight-mood">Mood: Motivated and Ambitious (4.5/5)</div>
+                            </div>
+                        </div>
+                        <div class="entry-actions">
+                            <button class="action-button">
+                                <span>💾</span>
+                                <span>Save to Highlights</span>
+                            </button>
+                            <button class="action-button">
+                                <span>📝</span>
+                                <span>View Transcript</span>
+                            </button>
+                            <button class="action-button">
+                                <span>🔗</span>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="load-more">
+                <button class="load-more-button" onclick="loadMoreEntries()">
+                    Load Earlier Entries
+                </button>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">📊</div>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📚</div>
+                <span>Library</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">⚙️</div>
+                <span>Settings</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentlyPlaying = null;
+        let progressIntervals = {};
+
+        // Play/pause functionality
+        function togglePlay(button) {
+            const isCurrentlyPlaying = button.classList.contains('playing');
+            
+            // Stop any currently playing audio
+            if (currentlyPlaying && currentlyPlaying !== button) {
+                currentlyPlaying.classList.remove('playing');
+                currentlyPlaying.innerHTML = '▶️';
+                clearInterval(progressIntervals[currentlyPlaying.dataset.id]);
+            }
+            
+            if (isCurrentlyPlaying) {
+                // Pause current audio
+                button.classList.remove('playing');
+                button.innerHTML = '▶️';
+                clearInterval(progressIntervals[button.dataset.id]);
+                currentlyPlaying = null;
+            } else {
+                // Play audio
+                button.classList.add('playing');
+                button.innerHTML = '⏸️';
+                currentlyPlaying = button;
+                
+                // Simulate audio progress
+                const progressBar = button.closest('.audio-player').querySelector('.waveform-progress');
+                const duration = getDurationFromText(button.closest('.audio-player').querySelector('.audio-duration').textContent);
+                let progress = 0;
+                const interval = 100; // Update every 100ms
+                const increment = 100 / (duration * 10); // Progress increment per 100ms
+                
+                button.dataset.id = Math.random().toString(36).substr(2, 9);
+                
+                progressIntervals[button.dataset.id] = setInterval(() => {
+                    progress += increment;
+                    progressBar.style.width = Math.min(progress, 100) + '%';
+                    
+                    if (progress >= 100) {
+                        button.classList.remove('playing');
+                        button.innerHTML = '▶️';
+                        clearInterval(progressIntervals[button.dataset.id]);
+                        currentlyPlaying = null;
+                        progressBar.style.width = '0%';
+                    }
+                }, interval);
+            }
+        }
+
+        // Extract duration in seconds from text like "7:42 minutes"
+        function getDurationFromText(text) {
+            const match = text.match(/(\d+):(\d+)/);
+            if (match) {
+                return parseInt(match[1]) * 60 + parseInt(match[2]);
+            }
+            return 300; // Default 5 minutes
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const filter = tab.dataset.filter;
+                filterEntries(filter);
+            });
+        });
+
+        function filterEntries(filter) {
+            const timelineGroups = document.querySelectorAll('.timeline-group');
+            const today = new Date();
+            
+            timelineGroups.forEach(group => {
+                const dateHeader = group.querySelector('.date-header').textContent;
+                let shouldShow = true;
+                
+                if (filter === 'week') {
+                    // Show only entries from the last 7 days
+                    if (dateHeader.includes('Monday, June 2')) {
+                        shouldShow = false;
+                    }
+                } else if (filter === 'month') {
+                    // Show only entries from this month (June)
+                    shouldShow = dateHeader.includes('June');
+                }
+                
+                group.style.display = shouldShow ? 'block' : 'none';
+                if (shouldShow) {
+                    group.style.animation = 'slideIn 0.3s ease-out';
+                }
+            });
+        }
+
+        // Action button handlers
+        document.querySelectorAll('.action-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                const action = button.textContent.trim();
+                let message = '';
+                
+                if (action.includes('Save to Highlights')) {
+                    message = 'Entry saved to highlights ✓';
+                    button.style.background = 'rgba(5, 150, 105, 0.1)';
+                    button.style.borderColor = '#059669';
+                    button.style.color = '#059669';
+                } else if (action.includes('View Transcript')) {
+                    message = 'Opening transcript view...';
+                } else if (action.includes('Share')) {
+                    message = 'Opening share options...';
+                }
+                
+                showNotification(message);
+                
+                // Reset button style after 2 seconds
+                if (action.includes('Save to Highlights')) {
+                    setTimeout(() => {
+                        button.style.background = 'none';
+                        button.style.borderColor = 'rgba(139, 92, 246, 0.2)';
+                        button.style.color = '#8b5cf6';
+                    }, 2000);
+                }
+            });
+        });
+
+        // Load more entries
+        function loadMoreEntries() {
+            const timeline = document.getElementById('timeline');
+            const loadMoreButton = document.querySelector('.load-more-button');
+            
+            loadMoreButton.textContent = 'Loading...';
+            loadMoreButton.disabled = true;
+            
+            setTimeout(() => {
+                // Add older entries
+                const olderEntries = `
+                    <div class="timeline-group">
+                        <div class="date-header">Friday, May 31</div>
+                        <div class="journal-entry">
+                            <div class="recording-limit-indicator">6:15 / 10:00</div>
+                            <div class="entry-header">
+                                <div class="entry-meta">
+                                    <span class="entry-time">8:00 PM</span>
+                                    <span class="entry-category">🔮 Future</span>
+                                </div>
+                                <h3 class="entry-title">Month-End Reflection</h3>
+                                <p class="entry-prompt">"What are your hopes for the coming month?"</p>
+                            </div>
+                            <div class="entry-content">
+                                <div class="audio-player">
+                                    <div class="player-controls">
+                                        <button class="play-button" onclick="togglePlay(this)">▶️</button>
+                                        <div class="player-info">
+                                            <div class="audio-duration">6:15 minutes</div>
+                                            <div class="audio-quality">Good quality • Thoughtful pace</div>
+                                        </div>
+                                    </div>
+                                    <div class="waveform">
+                                        <div class="waveform-progress"></div>
+                                        <div class="waveform-bars">
+                                            ${generateWaveformBars()}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="entry-insights">
+                                    <div class="insight-title">
+                                        <span>🧠</span>
+                                        <span>AI Insights</span>
+                                    </div>
+                                    <div class="insight-tags">
+                                        <span class="insight-tag">Future Planning</span>
+                                        <span class="insight-tag">Optimism</span>
+                                        <span class="insight-tag">Goal Setting</span>
+                                    </div>
+                                    <div class="insight-mood">Mood: Hopeful and Forward-looking (4.1/5)</div>
+                                </div>
+                            </div>
+                            <div class="entry-actions">
+                                <button class="action-button">
+                                    <span>💾</span>
+                                    <span>Save to Highlights</span>
+                                </button>
+                                <button class="action-button">
+                                    <span>📝</span>
+                                    <span>View Transcript</span>
+                                </button>
+                                <button class="action-button">
+                                    <span>🔗</span>
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                timeline.insertAdjacentHTML('beforeend', olderEntries);
+                
+                // Re-add event listeners to new action buttons
+                addActionButtonListeners();
+                
+                loadMoreButton.textContent = 'Load Earlier Entries';
+                loadMoreButton.disabled = false;
+            }, 1500);
+        }
+
+        function generateWaveformBars() {
+            let bars = '';
+            for (let i = 0; i < 16; i++) {
+                const height = Math.random() * 60 + 30; // Random height between 30-90%
+                bars += `<div class="waveform-bar" style="height: ${height}%;"></div>`;
+            }
+            return bars;
+        }
+
+        function addActionButtonListeners() {
+            // Re-apply event listeners to newly added action buttons
+            document.querySelectorAll('.action-button:not([data-listener])').forEach(button => {
+                button.dataset.listener = 'true';
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    const action = button.textContent.trim();
+                    let message = '';
+                    
+                    if (action.includes('Save to Highlights')) {
+                        message = 'Entry saved to highlights ✓';
+                        button.style.background = 'rgba(5, 150, 105, 0.1)';
+                        button.style.borderColor = '#059669';
+                        button.style.color = '#059669';
+                    } else if (action.includes('View Transcript')) {
+                        message = 'Opening transcript view...';
+                    } else if (action.includes('Share')) {
+                        message = 'Opening share options...';
+                    }
+                    
+                    showNotification(message);
+                    
+                    if (action.includes('Save to Highlights')) {
+                        setTimeout(() => {
+                            button.style.background = 'none';
+                            button.style.borderColor = 'rgba(139, 92, 246, 0.2)';
+                            button.style.color = '#8b5cf6';
+                        }, 2000);
+                    }
+                });
+            });
+        }
+
+        // Back navigation
+        function goBack() {
+            alert('Returning to Analytics dashboard...');
+        }
+
+        // Navigation handling
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // Notification system
+        function showNotification(message) {
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: 500;
+                box-shadow: 0 4px 20px rgba(5, 150, 105, 0.3);
+                z-index: 1000;
+                animation: slideDown 0.3s ease-out;
+            `;
+            notification.textContent = message;
+
+            if (!document.querySelector('#notificationStyles')) {
+                const style = document.createElement('style');
+                style.id = 'notificationStyles';
+                style.textContent = `
+                    @keyframes slideDown {
+                        from {
+                            opacity: 0;
+                            transform: translateX(-50%) translateY(-20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateX(-50%) translateY(0);
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideDown 0.3s ease-out reverse';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Entry hover effects
+        document.querySelectorAll('.journal-entry').forEach(entry => {
+            entry.addEventListener('mouseenter', () => {
+                entry.style.transform = 'translateY(-2px)';
+            });
+            
+            entry.addEventListener('mouseleave', () => {
+                entry.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
