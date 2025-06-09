@@ -2531,9 +2531,40 @@
             setTimeout(() => {
                 showNotification('Welcome back to Rambl! 🎉');
                 // Go directly to main app for existing users
-                document.querySelector('.app-container').style.display = 'none';
-                document.getElementById('mainAppContainer').style.display = 'block';
-                showScreen('homeScreen');
+                const authContainer = document.querySelector('.app-container');
+                const mainContainer = document.getElementById('mainAppContainer');
+                const onboardingContainer = document.getElementById('onboardingContainer');
+                
+                // Hide auth and onboarding containers
+                if (authContainer) {
+                    authContainer.style.display = 'none';
+                    authContainer.style.visibility = 'hidden';
+                }
+                if (onboardingContainer) {
+                    onboardingContainer.style.display = 'none';
+                    onboardingContainer.style.visibility = 'hidden';
+                }
+                
+                // Show main app container
+                if (mainContainer) {
+                    mainContainer.style.display = 'block';
+                    mainContainer.style.visibility = 'visible';
+                    
+                    // Reset all screens and show home
+                    document.querySelectorAll('#mainAppContainer .screen').forEach(screen => {
+                        screen.classList.remove('active');
+                        screen.style.display = 'none';
+                    });
+                    
+                    const homeScreen = document.getElementById('homeScreen');
+                    if (homeScreen) {
+                        homeScreen.style.display = 'block';
+                        homeScreen.classList.add('active');
+                        currentScreen = 'homeScreen';
+                        updateNavigation();
+                    }
+                }
+                
                 button.textContent = 'Sign In';
                 button.disabled = false;
             }, 1500);
