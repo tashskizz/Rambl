@@ -17,6 +17,19 @@
             min-height: 100vh;
             color: #2d1b69;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ensure no content bleeds from hidden containers */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            z-index: -1;
         }
 
         .app-container {
@@ -26,22 +39,57 @@
             position: relative;
             background: white;
             box-shadow: 0 0 50px rgba(106, 90, 205, 0.1);
+            z-index: 10;
         }
 
-        /* Screen Management */
+        /* Onboarding Container - for full screen purple background */
+        .onboarding-container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            z-index: 10;
+        }
+
+        #mainAppContainer {
+            z-index: 10;
+            position: relative;
+            background: white;
+        }
+
+        /* Screen Management - Force isolation */
         .screen {
-            display: none;
+            display: none !important;
             min-height: 100vh;
             position: relative;
             opacity: 0;
             transform: translateX(20px);
             transition: all 0.4s ease-out;
+            background: white;
+            z-index: 1;
         }
 
         .screen.active {
-            display: block;
+            display: block !important;
             opacity: 1;
             transform: translateX(0);
+            z-index: 2;
+        }
+
+        /* Force hide inactive containers */
+        .app-container:not([style*="display: block"]) {
+            display: none !important;
+        }
+
+        .onboarding-container:not([style*="display: flex"]) {
+            display: none !important;
+        }
+
+        #mainAppContainer:not([style*="display: block"]) {
+            display: none !important;
         }
 
         /* Common Styles */
@@ -192,6 +240,7 @@
             padding: 40px 30px 30px;
             margin-top: 20px;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .form-section::before {
@@ -988,8 +1037,337 @@
             background: rgba(139, 92, 246, 0.1);
             text-decoration: none;
         }
+
+        /* ONBOARDING STYLES */
+        .onboarding-header {
+            padding: 60px 30px 40px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .onboarding-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+        }
+
+        .onboarding-logo svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 8px 32px rgba(0,0,0,0.2));
+        }
+
+        .onboarding-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .onboarding-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            line-height: 1.4;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .content-section {
+            flex: 1;
+            background: white;
+            border-radius: 30px 30px 0 0;
+            padding: 40px 30px 40px;
+            position: relative;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+        }
+
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 2px;
+        }
+
+        .onboarding-section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d1b69;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .intro-section {
+            background: linear-gradient(135deg, #f8f6ff 0%, #f3f0ff 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            text-align: center;
+        }
+
+        .intro-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .intro-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #6b46c1;
+            margin-bottom: 12px;
+        }
+
+        .intro-description {
+            font-size: 16px;
+            color: #4c1d95;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .intro-highlight {
+            background: rgba(139, 92, 246, 0.1);
+            color: #6b46c1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .questionnaire-form {
+            margin-top: 30px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4c1d95;
+            margin-bottom: 12px;
+        }
+
+        .onboarding-form-subtitle {
+            font-size: 14px;
+            color: #8b5cf6;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .option-grid.single-column {
+            grid-template-columns: 1fr;
+        }
+
+        .option-card {
+            background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 18px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            transform: translateY(-2px);
+            border-color: #a855f7;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+        }
+
+        .option-card.selected {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .option-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .option-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .option-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .option-description {
+            font-size: 12px;
+            opacity: 0.8;
+            line-height: 1.3;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(139, 92, 246, 0.15);
+            border-radius: 16px;
+            font-size: 16px;
+            background: rgba(248, 246, 255, 0.5);
+            color: #2d1b69;
+            transition: all 0.3s ease;
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .text-input:focus {
+            border-color: #8b5cf6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .text-input::placeholder {
+            color: rgba(139, 92, 246, 0.5);
+        }
+
+        .progress-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 30px 0;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: #8b5cf6;
+            transform: scale(1.3);
+        }
+
+        .continue-button {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .continue-button.enabled {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .continue-button.enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .skip-button {
+            background: none;
+            border: none;
+            color: #8b5cf6;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .skip-button:hover {
+            color: #7c3aed;
+        }
+
+        .question-step {
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .question-step.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.08);
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .benefit-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .benefit-text {
+            font-size: 14px;
+            color: #4c1d95;
+            line-height: 1.4;
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 375px) {
-            .app-container {
+            .app-container, .onboarding-container {
                 max-width: 100%;
             }
             
@@ -1141,9 +1519,232 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- ONBOARDING SCREENS -->
+    <div class="onboarding-container" id="onboardingContainer" style="display: none;">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+
+        <div class="onboarding-header">
+            <div class="onboarding-logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 80 L20 20 C20 20, 30 10, 55 20 C70 25, 75 35, 70 50 C65 60, 55 65, 40 60" 
+                              stroke-dasharray="3,1" opacity="0.9"/>
+                        <path d="M23 18 L23 82 M40 60 L75 85" stroke-width="3.5"/>
+                        <path d="M23 20 C23 20, 33 8, 58 18 C73 23, 80 33, 75 48 C70 58, 60 63, 45 58"
+                              stroke-dasharray="2,3" opacity="0.7"/>
+                        <circle cx="35" cy="35" r="4" fill="#ffffff" opacity="0.8"/>
+                        <path d="M50 35 Q58 42, 50 50" stroke-width="3" opacity="0.9"/>
+                    </g>
+                </svg>
+            </div>
+            <h1 class="onboarding-title">Welcome to Rambl!</h1>
+            <p class="onboarding-subtitle">Let's personalize your voice journaling journey</p>
+        </div>
+
+        <div class="content-section">
+            <!-- Introduction Step -->
+            <div class="question-step active" id="step0">
+                <div class="intro-section">
+                    <div class="intro-icon">🎤</div>
+                    <h2 class="intro-title">Your Voice, Your Thoughts, Your Journey</h2>
+                    <p class="intro-description">
+                        Rambl is your personal voice journaling companion. Spend just 10 minutes speaking your thoughts to organize the chaos of your mind and discover insights about yourself.
+                    </p>
+                    <div class="intro-highlight">
+                        ⏱️ 10-minute sessions • 🧠 AI insights • 📈 Track your growth
+                    </div>
+                </div>
+
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🗣️</div>
+                        <div class="benefit-text">
+                            <strong>Voice-first design:</strong> More natural than typing, captures emotion and tone
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🎯</div>
+                        <div class="benefit-text">
+                            <strong>Guided prompts:</strong> Never stare at a blank page again with thoughtful questions
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">📊</div>
+                        <div class="benefit-text">
+                            <strong>Smart insights:</strong> Discover patterns in your thoughts and track your emotional journey
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🔒</div>
+                        <div class="benefit-text">
+                            <strong>Privacy-focused:</strong> Your thoughts stay yours with local processing and encryption
+                        </div>
+                    </div>
+                </div>
+
+                <button class="continue-button enabled" onclick="nextOnboardingStep()">
+                    Let's Get Started
+                </button>
+            </div>
+
+            <!-- Age Bracket Question -->
+            <div class="question-step" id="step1">
+                <h2 class="onboarding-section-title">What's your age range?</h2>
+                <p class="onboarding-form-subtitle">This helps us tailor prompts and recommendations to your life stage</p>
+
+                <div class="option-grid">
+                    <div class="option-card" data-value="18-25" onclick="selectOnboardingOption(this, 'age')">
+                        <div class="option-icon">🌱</div>
+                        <div class="option-title">18-25</div>
+                        <div class="option-description">Early career & discovery</div>
+                    </div>
+                    <div class="option-card" data-value="26-35" onclick="selectOnboardingOption(this, 'age')">
+                        <div class="option-icon">🚀</div>
+                        <div class="option-title">26-35</div>
+                        <div class="option-description">Building & growing</div>
+                    </div>
+                    <div class="option-card" data-value="36-45" onclick="selectOnboardingOption(this, 'age')">
+                        <div class="option-icon">🎯</div>
+                        <div class="option-title">36-45</div>
+                        <div class="option-description">Achieving & leading</div>
+                    </div>
+                    <div class="option-card" data-value="46-55" onclick="selectOnboardingOption(this, 'age')">
+                        <div class="option-icon">🌿</div>
+                        <div class="option-title">46-55</div>
+                        <div class="option-description">Reflecting & mentoring</div>
+                    </div>
+                    <div class="option-card" data-value="56-65" onclick="selectOnboardingOption(this, 'age')">
+                        <div class="option-icon">🏔️</div>
+                        <div class="option-title">56-65</div>
+                        <div class="option-description">Wisdom & transition</div>
+                    </div>
+                    <div class="option-card" data-value="65+" onclick="selectOnboardingOption(this, 'age')">
+                        <div class="option-icon">🌟</div>
+                        <div class="option-title">65+</div>
+                        <div class="option-description">Legacy & fulfillment</div>
+                    </div>
+                </div>
+
+                <div class="progress-indicators">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                </div>
+
+                <button class="continue-button" id="continueStep1" onclick="nextOnboardingStep()">
+                    Continue
+                </button>
+                <button class="skip-button" onclick="nextOnboardingStep()">Skip this question</button>
+            </div>
+
+            <!-- Journaling Frequency Question -->
+            <div class="question-step" id="step2">
+                <h2 class="onboarding-section-title">How often do you plan to journal?</h2>
+                <p class="onboarding-form-subtitle">We'll customize reminders and content based on your goals</p>
+
+                <div class="option-grid single-column">
+                    <div class="option-card" data-value="daily" onclick="selectOnboardingOption(this, 'frequency')">
+                        <div class="option-icon">☀️</div>
+                        <div class="option-title">Daily (Most effective)</div>
+                        <div class="option-description">Build a consistent habit for maximum insight and growth</div>
+                    </div>
+                    <div class="option-card" data-value="few-times-week" onclick="selectOnboardingOption(this, 'frequency')">
+                        <div class="option-icon">📅</div>
+                        <div class="option-title">A few times a week</div>
+                        <div class="option-description">Regular check-ins to stay connected with your thoughts</div>
+                    </div>
+                    <div class="option-card" data-value="weekly" onclick="selectOnboardingOption(this, 'frequency')">
+                        <div class="option-icon">🗓️</div>
+                        <div class="option-title">Weekly</div>
+                        <div class="option-description">Weekly reflection to process the week's experiences</div>
+                    </div>
+                    <div class="option-card" data-value="monthly" onclick="selectOnboardingOption(this, 'frequency')">
+                        <div class="option-icon">📊</div>
+                        <div class="option-title">Monthly</div>
+                        <div class="option-description">Monthly deep dives to track longer-term patterns</div>
+                    </div>
+                    <div class="option-card" data-value="as-needed" onclick="selectOnboardingOption(this, 'frequency')">
+                        <div class="option-icon">🎯</div>
+                        <div class="option-title">As needed</div>
+                        <div class="option-description">Flexible journaling when you feel like processing thoughts</div>
+                    </div>
+                </div>
+
+                <div class="progress-indicators">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                </div>
+
+                <button class="continue-button" id="continueStep2" onclick="nextOnboardingStep()">
+                    Continue
+                </button>
+                <button class="skip-button" onclick="nextOnboardingStep()">Skip this question</button>
+            </div>
+
+            <!-- Primary Goals Question -->
+            <div class="question-step" id="step3">
+                <h2 class="onboarding-section-title">What brings you to Rambl?</h2>
+                <p class="onboarding-form-subtitle">Select all that resonate with you - we'll prioritize relevant prompts</p>
+
+                <div class="option-grid single-column">
+                    <div class="option-card" data-value="self-awareness" onclick="toggleOnboardingMultiOption(this, 'goals')">
+                        <div class="option-icon">🪞</div>
+                        <div class="option-title">Better self-awareness</div>
+                        <div class="option-description">Understand your thoughts, feelings, and patterns better</div>
+                    </div>
+                    <div class="option-card" data-value="stress-management" onclick="toggleOnboardingMultiOption(this, 'goals')">
+                        <div class="option-icon">🧘‍♀️</div>
+                        <div class="option-title">Stress management</div>
+                        <div class="option-description">Process difficult emotions and find mental clarity</div>
+                    </div>
+                    <div class="option-card" data-value="goal-clarity" onclick="toggleOnboardingMultiOption(this, 'goals')">
+                        <div class="option-icon">🎯</div>
+                        <div class="option-title">Goal clarity</div>
+                        <div class="option-description">Get clear on what you want and track your progress</div>
+                    </div>
+                    <div class="option-card" data-value="personal-growth" onclick="toggleOnboardingMultiOption(this, 'goals')">
+                        <div class="option-icon">🌱</div>
+                        <div class="option-title">Personal growth</div>
+                        <div class="option-description">Develop insights and wisdom from your experiences</div>
+                    </div>
+                    <div class="option-card" data-value="daily-reflection" onclick="toggleOnboardingMultiOption(this, 'goals')">
+                        <div class="option-icon">💭</div>
+                        <div class="option-title">Daily reflection</div>
+                        <div class="option-description">Regular check-ins to stay mindful and intentional</div>
+                    </div>
+                    <div class="option-card" data-value="mental-health" onclick="toggleOnboardingMultiOption(this, 'goals')">
+                        <div class="option-icon">❤️</div>
+                        <div class="option-title">Mental health support</div>
+                        <div class="option-description">Complement therapy or self-care with regular journaling</div>
+                    </div>
+                </div>
+
+                <div class="progress-indicators">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                </div>
+
+                <button class="continue-button" id="continueStep3" onclick="finishOnboarding()">
+                    Start Journaling
+                </button>
+                <button class="skip-button" onclick="finishOnboarding()">Skip and start journaling</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SCREENS -->
+    <div class="app-container" id="mainAppContainer" style="display: none;">
         <!-- Home Screen -->
-        <div class="screen" id="homeScreen">
+        <div class="screen active" id="homeScreen">
             <div class="header">
                 <div class="header-content home-header">
                     <div class="logo" style="width: 80px; height: 80px;">
@@ -1179,6 +1780,11 @@
                             <div class="category-icon">🔮</div>
                             <div class="category-title">Future</div>
                             <div class="category-levels">5 Levels</div>
+                        </div>
+                        <div class="category-card" data-category="goals">
+                            <div class="category-icon">🎯</div>
+                            <div class="category-title">Goals</div>
+                            <div class="category-levels">6 Levels</div>
                         </div>
                     </div>
                 </div>
@@ -1575,6 +2181,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="screen" id="timelineScreen">
             <div class="header">
                 <div class="header-content">
@@ -1706,6 +2313,14 @@
         let selectedCategory = null;
         let selectedLevel = null;
         let currentPromptCategory = 'goals';
+        
+        // Onboarding variables
+        let currentOnboardingStep = 0;
+        let userData = {
+            age: null,
+            frequency: null,
+            goals: []
+        };
 
         // Prompt database
         const prompts = {
@@ -1837,20 +2452,43 @@
 
         // Screen Navigation
         function showScreen(screenId) {
-            // Hide all screens first
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            
-            // Small delay for smooth transition
-            setTimeout(() => {
-                const targetScreen = document.getElementById(screenId);
-                if (targetScreen) {
-                    targetScreen.classList.add('active');
-                    currentScreen = screenId;
-                    updateNavigation();
+            try {
+                // Hide all screens first
+                document.querySelectorAll('.screen').forEach(screen => {
+                    if (screen) screen.classList.remove('active');
+                });
+                
+                // Hide all major containers
+                const containers = ['.app-container', '#onboardingContainer', '#mainAppContainer'];
+                containers.forEach(selector => {
+                    const container = document.querySelector(selector);
+                    if (container) container.style.display = 'none';
+                });
+                
+                // Show the correct container based on screen
+                if (screenId === 'loginScreen' || screenId === 'signupScreen') {
+                    const authContainer = document.querySelector('.app-container');
+                    if (authContainer) authContainer.style.display = 'block';
+                } else if (screenId.startsWith('step')) {
+                    const onboardingContainer = document.getElementById('onboardingContainer');
+                    if (onboardingContainer) onboardingContainer.style.display = 'flex';
+                } else {
+                    const mainContainer = document.getElementById('mainAppContainer');
+                    if (mainContainer) mainContainer.style.display = 'block';
                 }
-            }, 100);
+                
+                // Small delay for smooth transition
+                setTimeout(() => {
+                    const targetScreen = document.getElementById(screenId);
+                    if (targetScreen) {
+                        targetScreen.classList.add('active');
+                        currentScreen = screenId;
+                        updateNavigation();
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error in showScreen:', error);
+            }
         }
 
         function updateNavigation() {
@@ -1882,7 +2520,7 @@
             }
         }
 
-        // Simple login functions
+        // Auth functions
         function doLogin() {
             console.log('Login clicked');
             const button = document.querySelector('#loginScreen .primary-button');
@@ -1891,7 +2529,10 @@
             button.disabled = true;
             
             setTimeout(() => {
-                showNotification('Welcome to Rambl! 🎉');
+                showNotification('Welcome back to Rambl! 🎉');
+                // Go directly to main app for existing users
+                document.querySelector('.app-container').style.display = 'none';
+                document.getElementById('mainAppContainer').style.display = 'block';
                 showScreen('homeScreen');
                 button.textContent = 'Sign In';
                 button.disabled = false;
@@ -1906,8 +2547,36 @@
             button.disabled = true;
             
             setTimeout(() => {
-                showNotification('Account created! 🎉');
-                showScreen('homeScreen');
+                showNotification('Account created! Let\'s set up your profile 🎉');
+                
+                // Properly transition to onboarding
+                const authContainer = document.querySelector('.app-container');
+                const onboardingContainer = document.getElementById('onboardingContainer');
+                
+                if (authContainer) {
+                    authContainer.style.display = 'none';
+                    authContainer.style.visibility = 'hidden';
+                }
+                
+                if (onboardingContainer) {
+                    onboardingContainer.style.display = 'flex';
+                    onboardingContainer.style.visibility = 'visible';
+                    
+                    // Reset onboarding to first step
+                    currentOnboardingStep = 0;
+                    
+                    // Hide all onboarding steps
+                    document.querySelectorAll('.question-step').forEach(step => {
+                        step.classList.remove('active');
+                    });
+                    
+                    // Show first step
+                    const firstStep = document.getElementById('step0');
+                    if (firstStep) {
+                        firstStep.classList.add('active');
+                    }
+                }
+                
                 button.textContent = 'Create Account';
                 button.disabled = false;
             }, 2000);
@@ -1916,7 +2585,127 @@
         function quickLogin() {
             console.log('Quick login');
             showNotification('Welcome to Rambl Demo! 🎉');
+            document.querySelector('.app-container').style.display = 'none';
+            document.getElementById('mainAppContainer').style.display = 'block';
             showScreen('homeScreen');
+        }
+
+        // ONBOARDING FUNCTIONS
+        function nextOnboardingStep() {
+            console.log('Moving from step', currentOnboardingStep, 'to step', currentOnboardingStep + 1);
+            
+            // Hide current step
+            const currentStepElement = document.getElementById(`step${currentOnboardingStep}`);
+            if (currentStepElement) {
+                currentStepElement.classList.remove('active');
+                console.log('Hid step', currentOnboardingStep);
+            }
+            
+            // Move to next step
+            currentOnboardingStep++;
+            
+            // Show next step
+            const nextStepElement = document.getElementById(`step${currentOnboardingStep}`);
+            if (nextStepElement) {
+                nextStepElement.classList.add('active');
+                console.log('Showing step', currentOnboardingStep);
+            } else {
+                console.error('Step element not found:', `step${currentOnboardingStep}`);
+            }
+            
+            // Update continue button state
+            updateOnboardingContinueButton();
+        }
+
+        function selectOnboardingOption(element, category) {
+            // Remove selection from siblings
+            const siblings = element.parentElement.querySelectorAll('.option-card');
+            siblings.forEach(sibling => sibling.classList.remove('selected'));
+            
+            // Select current option
+            element.classList.add('selected');
+            
+            // Store selection
+            userData[category] = element.dataset.value;
+            
+            // Enable continue button
+            const continueBtn = document.getElementById(`continueStep${currentOnboardingStep}`);
+            if (continueBtn) {
+                continueBtn.classList.add('enabled');
+            }
+            
+            // Auto-advance after selection
+            setTimeout(() => {
+                nextOnboardingStep();
+            }, 800);
+        }
+
+        function toggleOnboardingMultiOption(element, category) {
+            // Toggle selection
+            element.classList.toggle('selected');
+            
+            // Update userData array
+            const value = element.dataset.value;
+            if (element.classList.contains('selected')) {
+                if (!userData[category].includes(value)) {
+                    userData[category].push(value);
+                }
+            } else {
+                userData[category] = userData[category].filter(item => item !== value);
+            }
+            
+            // Enable continue button if at least one selected
+            const continueBtn = document.getElementById(`continueStep${currentOnboardingStep}`);
+            if (continueBtn) {
+                if (userData[category].length > 0) {
+                    continueBtn.classList.add('enabled');
+                } else {
+                    continueBtn.classList.remove('enabled');
+                }
+            }
+        }
+
+        function updateOnboardingContinueButton() {
+            const continueBtn = document.getElementById(`continueStep${currentOnboardingStep}`);
+            if (continueBtn) {
+                continueBtn.classList.remove('enabled');
+            }
+        }
+
+        function finishOnboarding() {
+            // Store user data
+            console.log('User onboarding data:', userData);
+            
+            // Show completion message
+            showNotification('Welcome to Rambl! Let\'s start your first journal entry 🎉');
+            
+            // Transition to main app
+            setTimeout(() => {
+                const onboardingContainer = document.getElementById('onboardingContainer');
+                const mainAppContainer = document.getElementById('mainAppContainer');
+                
+                if (onboardingContainer) {
+                    onboardingContainer.style.display = 'none';
+                    onboardingContainer.style.visibility = 'hidden';
+                }
+                
+                if (mainAppContainer) {
+                    mainAppContainer.style.display = 'block';
+                    mainAppContainer.style.visibility = 'visible';
+                    
+                    // Reset main app to home screen
+                    document.querySelectorAll('#mainAppContainer .screen').forEach(screen => {
+                        screen.classList.remove('active');
+                    });
+                    
+                    const homeScreen = document.getElementById('homeScreen');
+                    if (homeScreen) {
+                        homeScreen.classList.add('active');
+                        currentScreen = 'homeScreen';
+                        updateNavigation();
+                    }
+                }
+            }, 1500);
         }
 
         // Category Selection - Updated to go to prompt screen
@@ -2075,17 +2864,22 @@
         }
 
         // Voice Recording - Updated to require prompt selection
-        document.getElementById('voiceButton')?.addEventListener('click', function() {
-            if (!selectedCategory) {
-                showNotification('Please select a category first, then choose your prompt depth 📝');
-                return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const voiceButton = document.getElementById('voiceButton');
+            if (voiceButton) {
+                voiceButton.addEventListener('click', function() {
+                    if (!selectedCategory) {
+                        showNotification('Please select a category first, then choose your prompt depth 📝');
+                        return;
+                    }
+                    
+                    // Navigate to prompt screen instead of immediate recording
+                    showNotification('Please choose your question depth first 🎯');
+                    setTimeout(() => {
+                        showScreen('promptScreen');
+                    }, 1000);
+                });
             }
-            
-            // Navigate to prompt screen instead of immediate recording
-            showNotification('Please choose your question depth first 🎯');
-            setTimeout(() => {
-                showScreen('promptScreen');
-            }, 1000);
         });
 
         function stopRecording() {
@@ -2237,8 +3031,44 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Rambl app starting...');
             
+            // FORCE hide all containers initially except auth
+            const onboardingContainer = document.getElementById('onboardingContainer');
+            const mainAppContainer = document.getElementById('mainAppContainer');
+            const authContainer = document.querySelector('.app-container');
+            
+            if (onboardingContainer) {
+                onboardingContainer.style.display = 'none';
+                onboardingContainer.style.visibility = 'hidden';
+            }
+            if (mainAppContainer) {
+                mainAppContainer.style.display = 'none';
+                mainAppContainer.style.visibility = 'hidden';
+            }
+            if (authContainer) {
+                authContainer.style.display = 'block';
+                authContainer.style.visibility = 'visible';
+            }
+            
+            // Hide only main app screens initially, not onboarding steps
+            document.querySelectorAll('#mainAppContainer .screen').forEach(screen => {
+                if (screen) {
+                    screen.classList.remove('active');
+                    screen.style.display = 'none';
+                }
+            });
+            
+            // Clear any timeline content that might be bleeding through (but not onboarding content)
+            const timelineElements = document.querySelectorAll('.timeline, .journal-entry, .date-header');
+            timelineElements.forEach(el => {
+                if (el && !el.closest('#timelineScreen') && !el.closest('#onboardingContainer')) {
+                    el.style.display = 'none';
+                }
+            });
+            
             // Start with login screen
-            showScreen('loginScreen');
+            setTimeout(() => {
+                showScreen('loginScreen');
+            }, 100);
             
             // Add demo skip button immediately
             const skipButton = document.createElement('button');
@@ -2271,7 +3101,7 @@
             };
             document.body.appendChild(skipButton);
             
-            console.log('✅ App initialized - try clicking Sign In or Skip to Demo');
+            console.log('✅ App initialized - try clicking Sign In or Sign Up or Skip to Demo');
         });
 
         // Handle back button
@@ -2293,7 +3123,8 @@
         document.addEventListener('touchstart', function(e) {
             if (e.target.classList.contains('category-card') || 
                 e.target.classList.contains('metric-card') ||
-                e.target.classList.contains('meditation-item')) {
+                e.target.classList.contains('meditation-item') ||
+                e.target.classList.contains('option-card')) {
                 e.target.style.transform = 'scale(0.98)';
             }
         });
@@ -2301,7 +3132,8 @@
         document.addEventListener('touchend', function(e) {
             if (e.target.classList.contains('category-card') || 
                 e.target.classList.contains('metric-card') ||
-                e.target.classList.contains('meditation-item')) {
+                e.target.classList.contains('meditation-item') ||
+                e.target.classList.contains('option-card')) {
                 setTimeout(() => {
                     e.target.style.transform = 'scale(1)';
                 }, 150);
@@ -2317,20 +3149,10 @@
 
         // Demo mode indicator
         setTimeout(() => {
-            console.log('🎉 Rambl Prototype Loaded!');
-            console.log('👆 Try interacting with all the elements');
-            console.log('📱 This is a fully interactive prototype');
+            console.log('🎉 Rambl Complete App Loaded!');
+            console.log('👆 Try the full flow: Sign Up → Onboarding → Main App');
+            console.log('📱 This is a fully integrated prototype');
         }, 1000);
     </script>
 </body>
-</html>-card" data-category="goals">
-                            <div class="category-icon">🎯</div>
-                            <div class="category-title">Goals</div>
-                            <div class="category-levels">5 Levels</div>
-                        </div>
-                        <div class="category-card" data-category="emotions">
-                            <div class="category-icon">❤️</div>
-                            <div class="category-title">Emotions</div>
-                            <div class="category-levels">6 Levels</div>
-                        </div>
-                        <div class="category
+</html>
