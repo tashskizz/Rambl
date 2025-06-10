@@ -1824,7 +1824,7 @@
                     <div class="nav-icon">📚</div>
                     <span>Library</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" onclick="showScreen('settingsScreen')">
                     <div class="nav-icon">⚙️</div>
                     <span>Settings</span>
                 </div>
@@ -1931,7 +1931,7 @@
                     <div class="nav-icon">📚</div>
                     <span>Library</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" onclick="showScreen('settingsScreen')">
                     <div class="nav-icon">⚙️</div>
                     <span>Settings</span>
                 </div>
@@ -2060,7 +2060,193 @@
                     <div class="nav-icon">📚</div>
                     <span>Library</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" onclick="showScreen('settingsScreen')">
+                    <div class="nav-icon">⚙️</div>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div class="screen" id="settingsScreen">
+            <div class="header">
+                <div class="header-content">
+                    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">Settings</h1>
+                    <p style="font-size: 16px; opacity: 0.9; font-weight: 400;">Manage your account and preferences</p>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Profile Section -->
+                <div style="background: linear-gradient(135deg, #f8f6ff 0%, #f3f0ff 100%); border-radius: 20px; padding: 25px; margin-bottom: 30px; border: 1px solid rgba(139, 92, 246, 0.1); text-align: center;">
+                    <div style="position: relative; display: inline-block; margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700; border: 4px solid white; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);">
+                            JD
+                        </div>
+                        <div style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; background: #8b5cf6; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; cursor: pointer; transition: all 0.3s ease;">
+                            📸
+                        </div>
+                    </div>
+                    <h2 style="font-size: 20px; font-weight: 700; color: #2d1b69; margin-bottom: 5px;">John Doe</h2>
+                    <p style="font-size: 14px; color: #8b5cf6; margin-bottom: 15px;">john.doe@email.com</p>
+                    
+                    <div style="display: flex; justify-content: space-around; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(139, 92, 246, 0.1);">
+                        <div style="text-align: center;">
+                            <div style="font-size: 18px; font-weight: 700; color: #6b46c1;">23</div>
+                            <div style="font-size: 12px; color: #8b5cf6; margin-top: 2px;">Sessions</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 18px; font-weight: 700; color: #6b46c1;">156</div>
+                            <div style="font-size: 12px; color: #8b5cf6; margin-top: 2px;">Minutes</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 18px; font-weight: 700; color: #6b46c1;">15</div>
+                            <div style="font-size: 12px; color: #8b5cf6; margin-top: 2px;">Days Active</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Settings -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 12px; font-size: 24px;">👤</span>
+                        Account
+                    </h3>
+                    
+                    <div style="background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #8b5cf6;">✏️</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #2d1b69; margin-bottom: 2px;">Edit Profile</div>
+                                <div style="font-size: 13px; color: #8b5cf6; opacity: 0.8;">Update your name and email</div>
+                            </div>
+                        </div>
+                        <div style="color: #8b5cf6; font-size: 16px;">→</div>
+                    </div>
+
+                    <div style="background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #8b5cf6;">🔐</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #2d1b69; margin-bottom: 2px;">Change Password</div>
+                                <div style="font-size: 13px; color: #8b5cf6; opacity: 0.8;">Update your account password</div>
+                            </div>
+                        </div>
+                        <div style="color: #8b5cf6; font-size: 16px;">→</div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 12px; font-size: 24px;">🔔</span>
+                        Notifications
+                    </h3>
+                    
+                    <div style="background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;" onclick="toggleNotification('daily')">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #8b5cf6;">📅</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #2d1b69; margin-bottom: 2px;">Daily Reminders</div>
+                                <div style="font-size: 13px; color: #8b5cf6; opacity: 0.8;">Get reminded to journal each day</div>
+                            </div>
+                        </div>
+                        <div style="position: relative; width: 50px; height: 28px; background: #8b5cf6; border-radius: 14px; cursor: pointer; transition: all 0.3s ease;" id="dailyToggle">
+                            <div style="position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transform: translateX(22px);"></div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;" onclick="toggleNotification('insights')">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #8b5cf6;">🧠</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #2d1b69; margin-bottom: 2px;">Weekly Insights</div>
+                                <div style="font-size: 13px; color: #8b5cf6; opacity: 0.8;">Receive AI-generated insights</div>
+                            </div>
+                        </div>
+                        <div style="position: relative; width: 50px; height: 28px; background: #8b5cf6; border-radius: 14px; cursor: pointer; transition: all 0.3s ease;" id="insightsToggle">
+                            <div style="position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transform: translateX(22px);"></div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;" onclick="toggleNotification('milestone')">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #8b5cf6;">🎉</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #2d1b69; margin-bottom: 2px;">Milestones</div>
+                                <div style="font-size: 13px; color: #8b5cf6; opacity: 0.8;">Celebrate your journaling achievements</div>
+                            </div>
+                        </div>
+                        <div style="position: relative; width: 50px; height: 28px; background: rgba(139, 92, 246, 0.2); border-radius: 14px; cursor: pointer; transition: all 0.3s ease;" id="milestoneToggle">
+                            <div style="position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 12px; font-size: 24px;">💬</span>
+                        Support
+                    </h3>
+                    
+                    <div style="background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;" onclick="showNotification('Opening help center... ❓')">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #8b5cf6;">❓</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #2d1b69; margin-bottom: 2px;">Help Center</div>
+                                <div style="font-size: 13px; color: #8b5cf6; opacity: 0.8;">FAQs and guides</div>
+                            </div>
+                        </div>
+                        <div style="color: #8b5cf6; font-size: 16px;">→</div>
+                    </div>
+
+                    <div style="background: white; border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;" onclick="showNotification('Rambl v1.0.0 - Built with ❤️')">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f0ff 0%, #e8e2ff 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #8b5cf6;">ℹ️</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #2d1b69; margin-bottom: 2px;">About Rambl</div>
+                                <div style="font-size: 13px; color: #8b5cf6; opacity: 0.8;">Version 1.0.0</div>
+                            </div>
+                        </div>
+                        <div style="color: #8b5cf6; font-size: 16px;">→</div>
+                    </div>
+                </div>
+
+                <!-- Account Actions -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #6b46c1; display: flex; align-items: center;">
+                        <span style="margin-right: 12px; font-size: 24px;">⚠️</span>
+                        Account Actions
+                    </h3>
+                    
+                    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 2px 15px rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s ease;" onclick="confirmLogout()">
+                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #dc2626;">🚪</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 16px; font-weight: 600; color: #dc2626; margin-bottom: 2px;">Log Out</div>
+                                <div style="font-size: 13px; color: #dc2626; opacity: 0.8;">Return to login screen</div>
+                            </div>
+                        </div>
+                        <div style="color: #dc2626; font-size: 16px;">→</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showScreen('homeScreen')">
+                    <div class="nav-icon">🏠</div>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="showScreen('analyticsScreen')">
+                    <div class="nav-icon">📊</div>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item" onclick="showScreen('libraryScreen')">
+                    <div class="nav-icon">📚</div>
+                    <span>Library</span>
+                </div>
+                <div class="nav-item active">
                     <div class="nav-icon">⚙️</div>
                     <span>Settings</span>
                 </div>
@@ -2175,7 +2361,7 @@
                     <div class="nav-icon">📚</div>
                     <span>Library</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" onclick="showScreen('settingsScreen')">
                     <div class="nav-icon">⚙️</div>
                     <span>Settings</span>
                 </div>
@@ -2299,7 +2485,7 @@
                     <div class="nav-icon">📚</div>
                     <span>Library</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" onclick="showScreen('settingsScreen')">
                     <div class="nav-icon">⚙️</div>
                     <span>Settings</span>
                 </div>
@@ -2320,6 +2506,17 @@
             age: null,
             frequency: null,
             goals: []
+        };
+
+        // Settings user data
+        let settingsUserData = {
+            name: "John Doe",
+            email: "john.doe@email.com",
+            notifications: {
+                daily: true,
+                insights: true,
+                milestone: false
+            }
         };
 
         // Prompt database
@@ -2345,29 +2542,6 @@
                     "How has your definition of success evolved over the years?",
                     "What legacy do you want to leave, and how do your current goals contribute to that?",
                     "If you could only achieve three things in your lifetime, what would they be and why?"
-                ]
-            },
-            emotions: {
-                surface: [
-                    "How are you feeling right now in one word?",
-                    "What's bringing you joy today?",
-                    "Rate your energy level from 1-10.",
-                    "What's one thing that made you smile recently?",
-                    "How's your mood compared to yesterday?"
-                ],
-                medium: [
-                    "What emotion have you been avoiding, and why might that be?",
-                    "How do you typically handle stress, and is it working for you?",
-                    "What triggers tend to affect your mood the most?",
-                    "When do you feel most like yourself?",
-                    "What's an emotion you'd like to experience more often?"
-                ],
-                deep: [
-                    "How do your emotions guide your decision-making, and is this serving you?",
-                    "What patterns do you notice in your emotional responses to different situations?",
-                    "How has your relationship with your emotions changed over time?",
-                    "What would it look like to fully accept and honor all of your feelings?",
-                    "If your emotions could speak, what wisdom would they share with you?"
                 ]
             },
             reflection: {
@@ -2444,13 +2618,12 @@
         // Category information
         const categoryInfo = {
             goals: { icon: '🎯', title: 'Goals', description: 'Focus on your aspirations and achievements' },
-            emotions: { icon: '❤️', title: 'Emotions', description: 'Explore your feelings and emotional patterns' },
             reflection: { icon: '💭', title: 'Reflection', description: 'Look back and find meaning in your experiences' },
             growth: { icon: '🌱', title: 'Growth', description: 'Discover how you\'re evolving and learning' },
             future: { icon: '🔮', title: 'Future', description: 'Envision and plan for what\'s ahead' }
         };
 
-        // Screen Navigation
+        // Screen Navigation - Fixed to handle promptScreen
         function showScreen(screenId) {
             try {
                 // Hide all screens first
@@ -2473,6 +2646,7 @@
                     const onboardingContainer = document.getElementById('onboardingContainer');
                     if (onboardingContainer) onboardingContainer.style.display = 'flex';
                 } else {
+                    // This includes promptScreen and all other main app screens
                     const mainContainer = document.getElementById('mainAppContainer');
                     if (mainContainer) mainContainer.style.display = 'block';
                 }
@@ -2505,7 +2679,9 @@
                 'homeScreen': 0,
                 'analyticsScreen': 1,
                 'timelineScreen': 1,
-                'libraryScreen': 2
+                'libraryScreen': 2,
+                'settingsScreen': 3,
+                'promptScreen': 0  // Prompt screen belongs to home navigation
             };
             
             const activeIndex = navMap[currentScreen];
@@ -2530,32 +2706,27 @@
             
             setTimeout(() => {
                 showNotification('Welcome back to Rambl! 🎉');
-                // Go directly to main app for existing users
-                const authContainer = document.querySelector('.app-container');
-                const mainContainer = document.getElementById('mainAppContainer');
-                const onboardingContainer = document.getElementById('onboardingContainer');
                 
-                // Hide auth and onboarding containers
+                // Hide auth container
+                const authContainer = document.querySelector('.app-container');
+                const mainAppContainer = document.getElementById('mainAppContainer');
+                
                 if (authContainer) {
                     authContainer.style.display = 'none';
                     authContainer.style.visibility = 'hidden';
                 }
-                if (onboardingContainer) {
-                    onboardingContainer.style.display = 'none';
-                    onboardingContainer.style.visibility = 'hidden';
-                }
                 
-                // Show main app container
-                if (mainContainer) {
-                    mainContainer.style.display = 'block';
-                    mainContainer.style.visibility = 'visible';
+                if (mainAppContainer) {
+                    mainAppContainer.style.display = 'block';
+                    mainAppContainer.style.visibility = 'visible';
                     
-                    // Reset all screens and show home
+                    // Hide all screens first
                     document.querySelectorAll('#mainAppContainer .screen').forEach(screen => {
                         screen.classList.remove('active');
                         screen.style.display = 'none';
                     });
                     
+                    // Show home screen specifically
                     const homeScreen = document.getElementById('homeScreen');
                     if (homeScreen) {
                         homeScreen.style.display = 'block';
@@ -2616,9 +2787,35 @@
         function quickLogin() {
             console.log('Quick login');
             showNotification('Welcome to Rambl Demo! 🎉');
-            document.querySelector('.app-container').style.display = 'none';
-            document.getElementById('mainAppContainer').style.display = 'block';
-            showScreen('homeScreen');
+            
+            // Hide auth container
+            const authContainer = document.querySelector('.app-container');
+            const mainAppContainer = document.getElementById('mainAppContainer');
+            
+            if (authContainer) {
+                authContainer.style.display = 'none';
+                authContainer.style.visibility = 'hidden';
+            }
+            
+            if (mainAppContainer) {
+                mainAppContainer.style.display = 'block';
+                mainAppContainer.style.visibility = 'visible';
+                
+                // Hide all screens first
+                document.querySelectorAll('#mainAppContainer .screen').forEach(screen => {
+                    screen.classList.remove('active');
+                    screen.style.display = 'none';
+                });
+                
+                // Show home screen specifically
+                const homeScreen = document.getElementById('homeScreen');
+                if (homeScreen) {
+                    homeScreen.style.display = 'block';
+                    homeScreen.classList.add('active');
+                    currentScreen = 'homeScreen';
+                    updateNavigation();
+                }
+            }
         }
 
         // ONBOARDING FUNCTIONS
@@ -2772,13 +2969,16 @@
             currentPromptCategory = category;
             const info = categoryInfo[category];
             
-            document.getElementById('selectedCategoryDisplay').innerHTML = `
-                <div class="category-icon">${info.icon}</div>
-                <div class="category-info">
-                    <h3>${info.title}</h3>
-                    <p>${info.description}</p>
-                </div>
-            `;
+            const selectedCategoryDisplay = document.getElementById('selectedCategoryDisplay');
+            if (selectedCategoryDisplay) {
+                selectedCategoryDisplay.innerHTML = `
+                    <div class="category-icon">${info.icon}</div>
+                    <div class="category-info">
+                        <h3>${info.title}</h3>
+                        <p>${info.description}</p>
+                    </div>
+                `;
+            }
             
             // Reset the prompt screen state
             resetMainSelection();
@@ -2799,18 +2999,22 @@
             });
             
             // Hide random option
-            document.getElementById('randomOptionBtn').classList.add('hidden');
+            const randomOptionBtn = document.getElementById('randomOptionBtn');
+            if (randomOptionBtn) randomOptionBtn.classList.add('hidden');
             
             // Make grid more compact
-            document.getElementById('difficultyGrid').classList.add('compact');
+            const difficultyGrid = document.getElementById('difficultyGrid');
+            if (difficultyGrid) difficultyGrid.classList.add('compact');
             
             // Select the chosen card
-            document.querySelector(`#promptScreen [data-level="${level}"]`).classList.add('selected');
+            const selectedCard = document.querySelector(`#promptScreen [data-level="${level}"]`);
+            if (selectedCard) selectedCard.classList.add('selected');
             
             // Show prompt right after the selected card
             setTimeout(() => {
                 showMainPrompt(level);
-                document.getElementById('changeSelectionMain').style.display = 'block';
+                const changeSelection = document.getElementById('changeSelectionMain');
+                if (changeSelection) changeSelection.style.display = 'block';
             }, 250);
         }
 
@@ -2821,13 +3025,15 @@
             
             // Visual feedback for random selection
             const randomButton = document.getElementById('randomOptionBtn');
-            randomButton.style.transform = 'scale(0.98)';
-            
-            setTimeout(() => {
-                randomButton.style.transform = 'scale(1)';
-                selectDifficulty(randomLevel);
-                showNotification(`🎲 Random ${randomLevel} question selected!`);
-            }, 150);
+            if (randomButton) {
+                randomButton.style.transform = 'scale(0.98)';
+                
+                setTimeout(() => {
+                    randomButton.style.transform = 'scale(1)';
+                    selectDifficulty(randomLevel);
+                    showNotification(`🎲 Random ${randomLevel} question selected!`);
+                }, 150);
+            }
         }
 
         // Show prompt for selected level
@@ -2837,15 +3043,27 @@
             
             // Update prompt display
             const levelBadge = document.getElementById('levelBadgeMain');
-            levelBadge.textContent = level.charAt(0).toUpperCase() + level.slice(1);
-            levelBadge.className = `level-badge ${level}`;
+            const promptCategory = document.getElementById('promptCategoryMain');
+            const promptText = document.getElementById('promptTextMain');
             
-            document.getElementById('promptCategoryMain').textContent = `${categoryInfo[currentPromptCategory].title} Question`;
-            document.getElementById('promptTextMain').textContent = randomPrompt;
+            if (levelBadge) {
+                levelBadge.textContent = level.charAt(0).toUpperCase() + level.slice(1);
+                levelBadge.className = `level-badge ${level}`;
+            }
+            
+            if (promptCategory) {
+                promptCategory.textContent = `${categoryInfo[currentPromptCategory].title} Question`;
+            }
+            
+            if (promptText) {
+                promptText.textContent = randomPrompt;
+            }
             
             // Show prompt display with animation
             const promptDisplay = document.getElementById('promptDisplayMain');
-            promptDisplay.classList.add('visible');
+            if (promptDisplay) {
+                promptDisplay.classList.add('visible');
+            }
         }
 
         // Shuffle to new prompt of same level
@@ -2853,13 +3071,15 @@
             if (selectedLevel) {
                 // Brief animation
                 const promptDisplay = document.getElementById('promptDisplayMain');
-                promptDisplay.style.transform = 'translateX(-10px)';
-                
-                setTimeout(() => {
-                    showMainPrompt(selectedLevel);
-                    promptDisplay.style.transform = 'translateX(0)';
-                    showNotification('🔄 New question selected!');
-                }, 150);
+                if (promptDisplay) {
+                    promptDisplay.style.transform = 'translateX(-10px)';
+                    
+                    setTimeout(() => {
+                        showMainPrompt(selectedLevel);
+                        promptDisplay.style.transform = 'translateX(0)';
+                        showNotification('🔄 New question selected!');
+                    }, 150);
+                }
             }
         }
 
@@ -2873,14 +3093,18 @@
             });
             
             // Show random option
-            document.getElementById('randomOptionBtn').classList.remove('hidden');
+            const randomOptionBtn = document.getElementById('randomOptionBtn');
+            if (randomOptionBtn) randomOptionBtn.classList.remove('hidden');
             
             // Reset grid
-            document.getElementById('difficultyGrid').classList.remove('compact');
+            const difficultyGrid = document.getElementById('difficultyGrid');
+            if (difficultyGrid) difficultyGrid.classList.remove('compact');
             
             // Hide prompt and change button
-            document.getElementById('promptDisplayMain').classList.remove('visible');
-            document.getElementById('changeSelectionMain').style.display = 'none';
+            const promptDisplay = document.getElementById('promptDisplayMain');
+            const changeSelection = document.getElementById('changeSelectionMain');
+            if (promptDisplay) promptDisplay.classList.remove('visible');
+            if (changeSelection) changeSelection.style.display = 'none';
         }
 
         // Start recording from prompt screen
@@ -2891,6 +3115,10 @@
             // Simulate recording for demo
             setTimeout(() => {
                 showNotification('📝 Recording saved! Check Analytics for insights');
+                // Navigate back to home screen after recording
+                setTimeout(() => {
+                    showScreen('homeScreen');
+                }, 1500);
             }, 3000);
         }
 
@@ -2913,12 +3141,34 @@
             }
         });
 
-        function stopRecording() {
-            const button = document.getElementById('voiceButton');
-            isRecording = false;
-            button.innerHTML = '🎤';
-            button.classList.remove('recording');
-            showNotification('Recording saved! Check your analytics for insights 📊');
+        // Settings functions
+        function toggleNotification(type) {
+            settingsUserData.notifications[type] = !settingsUserData.notifications[type];
+            const toggle = document.getElementById(type + 'Toggle');
+            
+            if (settingsUserData.notifications[type]) {
+                toggle.style.background = '#8b5cf6';
+                toggle.querySelector('div').style.transform = 'translateX(22px)';
+                showNotification(`${capitalizeFirst(type)} notifications enabled 🔔`);
+            } else {
+                toggle.style.background = 'rgba(139, 92, 246, 0.2)';
+                toggle.querySelector('div').style.transform = 'translateX(0)';
+                showNotification(`${capitalizeFirst(type)} notifications disabled 🔕`);
+            }
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function confirmLogout() {
+            if (confirm('Are you sure you want to log out?')) {
+                document.querySelector('.app-container').style.display = 'block';
+                document.getElementById('onboardingContainer').style.display = 'none';
+                document.getElementById('mainAppContainer').style.display = 'none';
+                showScreen('loginScreen');
+                showNotification('Logged out successfully 👋');
+            }
         }
 
         // Play Button Functionality
@@ -2993,44 +3243,6 @@
             }
         });
 
-        // Form Input Animations
-        document.addEventListener('focus', function(e) {
-            if (e.target.classList.contains('form-input')) {
-                e.target.style.transform = 'translateY(-2px)';
-            }
-        }, true);
-
-        document.addEventListener('blur', function(e) {
-            if (e.target.classList.contains('form-input')) {
-                e.target.style.transform = 'translateY(0)';
-            }
-        }, true);
-
-        // Hover Effects for Cards
-        document.addEventListener('mouseenter', function(e) {
-            if (e.target.classList.contains('metric-card')) {
-                e.target.style.transform = 'translateY(-5px)';
-                e.target.style.boxShadow = '0 8px 25px rgba(139, 92, 246, 0.15)';
-            }
-        }, true);
-
-        document.addEventListener('mouseleave', function(e) {
-            if (e.target.classList.contains('metric-card')) {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 20px rgba(139, 92, 246, 0.08)';
-            }
-        }, true);
-
-        // Search Functionality
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('search-input')) {
-                const searchTerm = e.target.value.toLowerCase();
-                if (searchTerm) {
-                    showNotification(`Searching for "${searchTerm}" 🔍`);
-                }
-            }
-        });
-
         // Notification System
         function showNotification(message) {
             // Remove existing notification
@@ -3088,14 +3300,6 @@
                 }
             });
             
-            // Clear any timeline content that might be bleeding through (but not onboarding content)
-            const timelineElements = document.querySelectorAll('.timeline, .journal-entry, .date-header');
-            timelineElements.forEach(el => {
-                if (el && !el.closest('#timelineScreen') && !el.closest('#onboardingContainer')) {
-                    el.style.display = 'none';
-                }
-            });
-            
             // Start with login screen
             setTimeout(() => {
                 showScreen('loginScreen');
@@ -3133,57 +3337,8 @@
             document.body.appendChild(skipButton);
             
             console.log('✅ App initialized - try clicking Sign In or Sign Up or Skip to Demo');
+            console.log('🎯 Category selection will now properly navigate to prompt screen');
         });
-
-        // Handle back button
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.back-button')) {
-                e.preventDefault();
-                if (currentScreen === 'timelineScreen') {
-                    showScreen('analyticsScreen');
-                }
-            }
-        });
-
-        // Prevent default form submissions
-        document.addEventListener('submit', function(e) {
-            e.preventDefault();
-        });
-
-        // Mobile touch improvements
-        document.addEventListener('touchstart', function(e) {
-            if (e.target.classList.contains('category-card') || 
-                e.target.classList.contains('metric-card') ||
-                e.target.classList.contains('meditation-item') ||
-                e.target.classList.contains('option-card')) {
-                e.target.style.transform = 'scale(0.98)';
-            }
-        });
-
-        document.addEventListener('touchend', function(e) {
-            if (e.target.classList.contains('category-card') || 
-                e.target.classList.contains('metric-card') ||
-                e.target.classList.contains('meditation-item') ||
-                e.target.classList.contains('option-card')) {
-                setTimeout(() => {
-                    e.target.style.transform = 'scale(1)';
-                }, 150);
-            }
-        });
-
-        // Keyboard navigation support
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && currentScreen === 'timelineScreen') {
-                showScreen('analyticsScreen');
-            }
-        });
-
-        // Demo mode indicator
-        setTimeout(() => {
-            console.log('🎉 Rambl Complete App Loaded!');
-            console.log('👆 Try the full flow: Sign Up → Onboarding → Main App');
-            console.log('📱 This is a fully integrated prototype');
-        }, 1000);
     </script>
 </body>
 </html>
